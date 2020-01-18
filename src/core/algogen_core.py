@@ -1,2 +1,3 @@
-def test():
-    print("tata")
+class Game:
+    def __init__(self):
+        print("tata")

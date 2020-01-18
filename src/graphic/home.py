@@ -1,13 +1,15 @@
 from tkinter import ttk
 
 
-class Home(ttk.Frame):
-    def __init__(self, master=None):
-        super().__init__(master)
-        self.pack()
-
-    def build(self):
-        root = self.master
-        qb = ttk.Button(root, text='Quitter', command=root.quit)
-        qb.pack()
-        root.mainloop()
+def home_build(root):
+    train_button = ttk.Button(root, text='Entraîner IA Génétique', command=root.quit)
+    train_button.pack()
+    play_button = ttk.Button(root, text='Jouer vs IA Génétique', command=root.quit)
+    play_button.pack()
+    ia_button = ttk.Button(root, text='IA vs IA', command=root.quit)
+    ia_button.pack()
+    options_button = ttk.Button(root, text='Options', command=root.quit)
+    options_button.pack()
+    quit_button = ttk.Button(root, text='Quitter', command=root.quit)
+    quit_button.pack()
+    root.mainloop()

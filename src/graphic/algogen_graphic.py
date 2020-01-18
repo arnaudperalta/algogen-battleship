@@ -1,12 +1,11 @@
-from tkinter import *
-# Fix pour bug visuel sur OSX
 from tkinter import ttk
-from home import Home
+from options import Options
+from home import *
 
 
 class App(ttk.Frame):
-    def __init__(self, master=None):
-        super().__init__(master)
+    def __init__(self, model):
+        super().__init__(None)
         self.pack()
 
     def build(self):
@@ -14,5 +13,21 @@ class App(ttk.Frame):
         root.title('AlgoGen Battleship')
         root.geometry("400x400")
         root.resizable(0, 0)
-        home = Home(root)
-        home.build()
+        self.home_draw()
+
+    def home_draw(self):
+        self.clear_frame()
+        home_build(self.master)
+
+    def quit_app(self):
+        self.master.quit
+
+    def options_draw(self):
+        self.clear_frame()
+        options = Options(self.master)
+        options.build()
+
+    def clear_frame(self):
+        for widget in self.winfo_children():
+            widget.destroy()
+
