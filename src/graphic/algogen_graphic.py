@@ -1,6 +1,6 @@
 from tkinter import ttk
+from board import Board
 from options import Options
-from home import *
 
 
 class App(ttk.Frame):
@@ -11,13 +11,29 @@ class App(ttk.Frame):
     def build(self):
         root = self.master
         root.title('AlgoGen Battleship')
-        root.geometry("400x400")
+        root.geometry("900x500")
         root.resizable(0, 0)
         self.home_draw()
+        root.mainloop()
 
     def home_draw(self):
         self.clear_frame()
-        home_build(self.master)
+        root = self.master
+        train_button = ttk.Button(root, text='Entraîner IA Génétique', command=root.quit)
+        train_button.pack()
+        play_button = ttk.Button(root, text='Jouer vs IA Génétique', command=self.play_vs_ia)
+        play_button.pack()
+        ia_button = ttk.Button(root, text='IA vs IA', command=root.quit)
+        ia_button.pack()
+        options_button = ttk.Button(root, text='Options', command=root.quit)
+        options_button.pack()
+        quit_button = ttk.Button(root, text='Quitter', command=root.quit)
+        quit_button.pack()
+
+    def play_vs_ia(self):
+        self.clear_frame()
+        board = Board(self.master)
+        board.draw()
 
     def quit_app(self):
         self.master.quit
@@ -28,6 +44,5 @@ class App(ttk.Frame):
         options.build()
 
     def clear_frame(self):
-        for widget in self.winfo_children():
-            widget.destroy()
-
+        for widget in self.master.winfo_children():
+            widget.pack_forget()
