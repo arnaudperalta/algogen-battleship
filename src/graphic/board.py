@@ -9,20 +9,22 @@ CELLS_BY_LINE = 5
 
 
 class Board(ttk.Frame):
-    def __init__(self, master=None):
-        super().__init__(master)
-        self.pack()
-        # Attributs graphique
-        frame_left = Frame(self.master)
-        frame_left.pack(side=LEFT)
-        frame_right = Frame(self.master)
-        frame_right.pack(side=RIGHT)
-        self.board_left = Canvas(frame_left.master
-                                 , width=BOARD_SIZE + 2 * BORDER_SIZE, height=BOARD_SIZE + 2 * BORDER_SIZE)
-        self.board_left.pack(side=LEFT)
-        self.board_right = Canvas(frame_right.master
-                                  , width=BOARD_SIZE + 2 * BORDER_SIZE, height=BOARD_SIZE + 2 * BORDER_SIZE)
-        self.board_right.pack(side=RIGHT)
+    def __init__(self, base_app):
+        super().__init__(base_app.master)
+        self.base_app = base_app
+        root = base_app.master
+
+        # Attributs graphiques
+        button_back = ttk.Button(root, text="Retour", command=self.back)
+        button_back.grid(row=0, column=0, sticky=W)
+        board_left_letters = Label(root, text="Ma grille", font=("Helvetica", 16))
+        board_left_letters.grid(row=0, column=0)
+        board_left_letters = Label(root, text="Grille adverse", font=("Helvetica", 16))
+        board_left_letters.grid(row=0, column=1)
+        self.board_left = Canvas(root, width=BOARD_SIZE + 2 * BORDER_SIZE, height=BOARD_SIZE + 2 * BORDER_SIZE)
+        self.board_left.grid(row=1, column=0)
+        self.board_right = Canvas(root, width=BOARD_SIZE + 2 * BORDER_SIZE, height=BOARD_SIZE + 2 * BORDER_SIZE)
+        self.board_right.grid(row=1, column=1)
 
     def draw(self):
         self.draw_grid(self.board_left, "left")
@@ -47,13 +49,16 @@ class Board(ttk.Frame):
                     canvas.bind("<Button-1>", self.boardright_callback)
 
     def boardleft_callback(self, event):
-        self.paint_cell(self.board_left, cell_coords(event.x, event.y))
+        paint_cell(self.board_left, cell_coords(event.x, event.y))
 
     def boardright_callback(self, event):
-        self.paint_cell(self.board_right, cell_coords(event.x, event.y))
+        paint_cell(self.board_right, cell_coords(event.x, event.y))
+
+    def back(self):
+        self.base_app.home_draw()
 
 
-def paint_cell(self, canvas, coords):
+def paint_cell(canvas, coords):
     cell_size = BOARD_SIZE / CELLS_BY_LINE
     canvas.create_rectangle(BORDER_SIZE + (coords[0]) * cell_size
                             , BORDER_SIZE + (coords[1]) * cell_size

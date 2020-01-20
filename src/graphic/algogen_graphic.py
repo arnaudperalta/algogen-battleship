@@ -11,7 +11,7 @@ class App(ttk.Frame):
     def build(self):
         root = self.master
         root.title('AlgoGen Battleship')
-        root.geometry("900x500")
+        root.geometry("830x500")
         root.resizable(0, 0)
         self.home_draw()
         root.mainloop()
@@ -32,7 +32,7 @@ class App(ttk.Frame):
 
     def play_vs_ia(self):
         self.clear_frame()
-        board = Board(self.master)
+        board = Board(self)
         board.draw()
 
     def quit_app(self):
