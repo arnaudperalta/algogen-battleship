@@ -25,7 +25,7 @@ class App(ttk.Frame):
         play_button.pack()
         ia_button = ttk.Button(root, text='IA vs IA', command=root.quit)
         ia_button.pack()
-        options_button = ttk.Button(root, text='Options', command=root.quit)
+        options_button = ttk.Button(root, text='Options', command=self.options_draw)
         options_button.pack()
         quit_button = ttk.Button(root, text='Quitter', command=root.quit)
         quit_button.pack()
@@ -40,7 +40,7 @@ class App(ttk.Frame):
 
     def options_draw(self):
         self.clear_frame()
-        options = Options(self.master)
+        options = Options(self.master, self)
         options.build()
 
     def clear_frame(self):
