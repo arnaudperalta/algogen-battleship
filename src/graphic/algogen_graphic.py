@@ -27,7 +27,7 @@ class App(ttk.Frame):
         ia_button.pack()
         options_button = ttk.Button(root, text='Options', command=self.options_draw)
         options_button.pack()
-        quit_button = ttk.Button(root, text='Quitter', command=root.quit)
+        quit_button = ttk.Button(root, text='Quitter', command=root.destroy)
         quit_button.pack()
 
     def play_vs_ia(self):

@@ -15,6 +15,10 @@ class Options(ttk.Frame):
         self.saved_percentage.set(data["saved_%"])
         self.mutation_chance = IntVar()
         self.mutation_chance.set(data["mut_%"])
+        self.def_gen = IntVar()
+        self.def_gen.set(data["def_gen"])
+        self.nbr_idv = IntVar()
+        self.nbr_idv.set(data["nbr_idv"])
         self.grid_size = IntVar()
         self.grid_size.set(data["grid_size"])
         self.ship_number = IntVar()
@@ -31,23 +35,27 @@ class Options(ttk.Frame):
         ttk.Entry(root, textvariable=self.saved_percentage).grid(row=2, column=2)
         ttk.Label(root, text='Chance de mutation (%)').grid(row=3, column=1)
         ttk.Entry(root, textvariable=self.mutation_chance).grid(row=3, column=2)
-        ttk.Label(root, text='Option du jeu :').grid(row=4, column=1, columnspan=2)
-        ttk.Label(root, text='Taille de la grille').grid(row=5, column=1)
-        ttk.Entry(root, textvariable=self.grid_size).grid(row=5, column=2)
-        ttk.Label(root, text='Nombre de navire').grid(row=6, column=1)
-        ttk.Entry(root, textvariable=self.ship_number).grid(row=6, column=2)
+        ttk.Label(root, text='Nombre de gène par défault').grid(row=4, column=1)
+        ttk.Entry(root, textvariable=self.def_gen).grid(row=4, column=2)
+        ttk.Label(root, text="Nombre d'individu").grid(row=5, column=1)
+        ttk.Entry(root, textvariable=self.nbr_idv).grid(row=5, column=2)
+        ttk.Label(root, text='Option du jeu :').grid(row=6, column=1, columnspan=2)
+        ttk.Label(root, text='Taille de la grille').grid(row=7, column=1)
+        ttk.Entry(root, textvariable=self.grid_size).grid(row=7, column=2)
+        ttk.Label(root, text='Nombre de navire').grid(row=8, column=1)
+        ttk.Entry(root, textvariable=self.ship_number).grid(row=8, column=2)
         save_button = ttk.Button(root, text='Sauvegarder', command=self.save_option)
-        save_button.grid(row=7, column=1, columnspan=2)
+        save_button.grid(row=9, column=1, columnspan=2)
         back_button = ttk.Button(root, text='Retour', command=self.return_call)
-        back_button.grid(row=8, column=1, columnspan=2)
+        back_button.grid(row=10, column=1, columnspan=2)
         root.grid_columnconfigure((0, 3), weight=1)
         # fin de liste
         root.mainloop()
 
     def save_option(self):
         data = {"nbr_gen": self.nbr_gen.get(), "saved_%": self.saved_percentage.get(),
-                "mut_%": self.mutation_chance.get(), "grid_size": self.grid_size.get(),
-                "ship_nbr": self.ship_number.get()}
+                "mut_%": self.mutation_chance.get(), "def_gen": self.def_gen.get(), "nbr_idv": self.nbr_idv.get(),
+                "grid_size": self.grid_size.get(), "ship_nbr": self.ship_number.get()}
         print(data)
         with open('./cfg/option.json', 'w') as file:
             json.dump(data, file)
