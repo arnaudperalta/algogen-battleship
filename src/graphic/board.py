@@ -8,6 +8,7 @@ CELLS_BY_LINE = 5
 PHASE_PLACEMENT = 0
 PHASE_TIR_ALLIE = 1
 PHASE_TIR_ENNEMI = 2
+FONT_BORDER = 7
 # Classe héritant de la classe Frame de tkinter
 
 
@@ -64,6 +65,7 @@ class Board(ttk.Frame):
                     canvas.bind("<Button-1>", self.boardleft_callback)
                 else:
                     canvas.bind("<Button-1>", self.boardright_callback)
+        draw_grid_coords(canvas)
 
     def boardleft_callback(self, event):
         if self.phase == PHASE_PLACEMENT:
@@ -84,7 +86,7 @@ class Board(ttk.Frame):
             widget.destroy()
 
     def ready_clicked(self):
-        self.button_ready.configure(state=DISABLED)
+        self.button_ready.destroy()
         self.phase = PHASE_TIR_ALLIE
         self.phase_label.configure(text="Phase de jeu : Tirez sur la grille ennemi.")
 
@@ -98,9 +100,28 @@ def paint_cell(canvas, coords, color):
                             , BORDER_SIZE + (coords[0] + 1) * cell_size
                             , BORDER_SIZE + (coords[1] + 1) * cell_size
                             , fill=color)
+    draw_grid_coords(canvas)
 
 
 # Transforme des coordonnées canvas en couple x,y de coords cellules
 def cell_coords(x, y):
     return [math.floor((x - BORDER_SIZE) * CELLS_BY_LINE / BOARD_SIZE),
             math.floor((y - BORDER_SIZE) * CELLS_BY_LINE / BOARD_SIZE)]
+
+
+def draw_grid_coords(canvas):
+    cell_size = BOARD_SIZE / CELLS_BY_LINE
+    x_coord = "A"
+    y_coord = "0"
+    canvas.delete("coord")
+    canvas.create_text(BORDER_SIZE + FONT_BORDER * 2, BORDER_SIZE + FONT_BORDER, font=("Helvetica", 12)
+                       , text=x_coord + " / " + y_coord, tags="coord")
+    # Tracé des lignes
+    for i in range(1, CELLS_BY_LINE):
+        x_coord = chr(ord(x_coord) + 1)
+        canvas.create_text(i * cell_size + BORDER_SIZE + FONT_BORDER, BORDER_SIZE + FONT_BORDER
+                           , font=("Helvetica", 12), text=x_coord, tags="coord")
+    for i in range(1, CELLS_BY_LINE):
+        y_coord = chr(ord(y_coord) + 1)
+        canvas.create_text(BORDER_SIZE + FONT_BORDER, i * cell_size + BORDER_SIZE + FONT_BORDER
+                           , font=("Helvetica", 12), text=y_coord, tags="coord")
