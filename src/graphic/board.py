@@ -19,32 +19,33 @@ class Board(ttk.Frame):
         root = base_app.master
 
         # Attributs graphiques et placements
-        button_back = ttk.Button(root, text="Retour", command=self.back)
-        button_back.grid(row=0, column=0, sticky=W)
-        board_left_name = Label(root, text="Ma grille", font=("Helvetica", 16))
-        board_left_name.grid(row=0, column=1, sticky=W)
-        board_right_name = Label(root, text="Grille adverse", font=("Helvetica", 16))
-        board_right_name.grid(row=0, column=2)
+        self.button_back = ttk.Button(root, text="Retour", command=self.back)
+        self.board_left_name = Label(root, text="Ma grille", font=("Helvetica", 16))
+        self.board_right_name = Label(root, text="Grille adverse", font=("Helvetica", 16))
         self.board_left = Canvas(root, width=BOARD_SIZE + 2 * BORDER_SIZE, height=BOARD_SIZE + 2 * BORDER_SIZE)
-        self.board_left.grid(row=1, column=0, columnspan=2)
         self.board_right = Canvas(root, width=BOARD_SIZE + 2 * BORDER_SIZE, height=BOARD_SIZE + 2 * BORDER_SIZE)
-        self.board_right.grid(row=1, column=2, columnspan=2)
-        red_label = Label(root, text="Case rouge : Bateau touché", fg="red")
-        red_label.grid(row=2, column=0, sticky=W)
-        brown_label = Label(root, text="Case marron : Bateau coulé", fg="brown")
-        brown_label.grid(row=2, column=1, sticky=W)
-        yellow_label = Label(root, text="Case bleue : Tir manqué", fg="blue")
-        yellow_label.grid(row=2, column=2)
-        grey_label = Label(root, text="Case grise : Pièce de bateau")
-        grey_label.grid(row=2, column=3)
+        self.red_label = Label(root, text="Case rouge : Bateau touché", fg="red")
+        self.brown_label = Label(root, text="Case marron : Bateau coulé", fg="brown")
+        self.yellow_label = Label(root, text="Case bleue : Tir manqué", fg="blue")
+        self.grey_label = Label(root, text="Case grise : Pièce de bateau")
         self.button_ready = ttk.Button(root, text="Prêt", command=self.ready_clicked)
-        self.button_ready.grid(row=3, column=1)
         self.phase_label = Label(root, text="Phase de jeu : Placez vos bateaux.")
-        self.phase_label.grid(row=3, column=0, sticky=W)
         # On désigne une phase de jeu
         self.phase = PHASE_PLACEMENT
 
     def draw(self):
+        self.button_back.grid(row=0, column=0, sticky=W)
+        self.board_left_name.grid(row=0, column=1, sticky=W)
+        self.board_right_name.grid(row=0, column=2)
+        self.board_left.grid(row=1, column=0, columnspan=2)
+        self.board_right.grid(row=1, column=2, columnspan=2)
+        self.red_label.grid(row=2, column=0, sticky=W)
+        self.brown_label.grid(row=2, column=1, sticky=W)
+        self.yellow_label.grid(row=2, column=2)
+        self.grey_label.grid(row=2, column=3)
+        self.button_ready.grid(row=3, column=1)
+        self.phase_label.grid(row=3, column=0, sticky=W)
+
         self.draw_grid(self.board_left, "left")
         self.draw_grid(self.board_right, "right")
 
