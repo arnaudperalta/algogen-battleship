@@ -1,6 +1,7 @@
 from tkinter import ttk
+from tkinter import *
+from tkinter.ttk import *
 from board import Board
-from trainer import Trainer
 from options import Options
 
 
@@ -8,6 +9,7 @@ class App(ttk.Frame):
     def __init__(self, model):
         super().__init__(None)
         self.pack()
+
 
     def build(self):
         root = self.master
@@ -20,21 +22,22 @@ class App(ttk.Frame):
     def home_draw(self):
         self.clear_frame()
         root = self.master
-        train_button = ttk.Button(root, text='Entraîner IA Génétique', command=self.training_draw)
-        train_button.pack()
-        play_button = ttk.Button(root, text='Jouer vs IA Génétique', command=self.play_vs_ia)
-        play_button.pack()
-        ia_button = ttk.Button(root, text='IA vs IA', command=root.quit)
-        ia_button.pack()
-        options_button = ttk.Button(root, text='Options', command=self.options_draw)
-        options_button.pack()
-        quit_button = ttk.Button(root, text='Quitter', command=root.destroy)
-        quit_button.pack()
 
-    def training_draw(self):
-        self.clear_frame()
-        trainer = Trainer(self, None)
-        trainer.draw()
+        title = Label(text = "AlgoGen Battleship",font=("Helvetica",30))
+        title.pack()
+        #Frame contenant les 5 boutons princpaux du menu
+        frame = Frame(root)
+        play_button = ttk.Button(frame, text='Jouer vs IA Génétique', command=self.play_vs_ia, width = 20).pack()
+        ia_button = ttk.Button(frame, text='IA vs IA', command=root.quit, width = 20).pack()
+        train_button = ttk.Button(frame, text='Entraîner IA Génétique', command=root.quit, width = 20).pack()
+        options_button = ttk.Button(frame, text='Options', command=self.options_draw, width = 20).pack(pady = 5)
+        quit_button = ttk.Button(frame, text='Quitter', command=root.destroy, width = 20).pack(pady = 5)
+        frame.pack(expand=YES)
+
+        text_noms = Label(root,text="Arnaud Peralta, Yohann Goffart, Louis Pariente - Q1 2020",font=("Helvetica")).pack(side=BOTTOM)
+
+
+
 
     def play_vs_ia(self):
         self.clear_frame()
