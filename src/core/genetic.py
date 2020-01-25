@@ -1,73 +1,19 @@
 import json
-from random import randint, choice
+from node import Node
 
 
 class Individu:
-    def __init__(self):
-        # ensemble de décision par défault
-        self.def_tree = []
+    def __init__(self, p):
         # ensemble de décision après un tir
-        self.hit_tree = []
+        self.hit_tree = None
+        # population correspondant à l'individu
+        self.population = p
 
-    def get_def_tree(self, prop):
-        return self.def_tree[prop]
+    def get_all_hit_tree(self):
+        return self.hit_tree
 
-    def get_hit_tree(self, prop):
-        return self.hit_tree[prop]
 
-    def set_def_tree(self, x_offset, y_offset, prop):
-        self.def_tree.insert(prop, (x_offset, y_offset))
-
-    def set_hit_tree(self, x_offset, y_offset, prop):
-        self.hit_tree.insert(prop, (x_offset, y_offset))
-
-    # ajout d'un gène aléatoire (dans le def_tree ou le hit_tree) avec une prioriété aléatoire
-    def pos_mutate(self):
-        v = choice([True, False])
-        x = randint(-self.grid_size, self.grid_size)
-        y = randint(-self.grid_size, self.grid_size)
-        if v:
-            k = randint(0, len(self.def_tree) - 1)
-            self.set_def_tree(x, y , k)
-        else:
-            k = randint(0, len(self.hit_tree) - 1)
-            self.set_hit_tree(x, y, k)
-
-    # suppression d'un gène TODO tj le dernier pour l'instant a voir pour changer plus tard
-    def neg_mutate(self):
-        v = choice([True, False])
-        if v:
-            self.def_tree.pop(len(self.def_tree) - 1)
-        else:
-            self.hit_tree.pop(len(self.hit_tree) - 1)
-
-    # nbr de gène total de l'individu
-    def gene_count(self):
-        return len(self.def_tree) + len(self.hit_tree)
-
-    @staticmethod
-    def merge(idv1, idv2):
-        new_idv = Individu()
-        l1 = max(len(idv1.def_tree), len(idv2.def_tree))
-        l2 = max(len(idv1.hit_tree), len(idv2.hit_tree))
-        for i in range(l1):
-            if i >= len(idv1.def_tree):
-                (k, l) = idv2.get_def_tree(i)
-                new_idv.set_def_tree(k, l, i)
-                continue
-            if i >= len(idv2.hit_tree):
-                (x, y) = idv1.get_def_tree(i)
-                new_idv.set_def_tree(x, y, i)
-                continue
-            (x, y) = idv1.get_def_tree(i)
-            (k, l) = idv2.get_def_tree(i)
-            v = choice([True, False])
-            if v:
-                new_idv.set_def_tree(x, y, i)
-                new_idv.set_def_tree(k, l, i + 1)
-            else:
-                new_idv.set_def_tree(k, l, i)
-                new_idv.set_def_tree(x, y, i + 1)
+   # TODO MUTATION ET REPRODUCTION
 
 
 class Population:
@@ -86,13 +32,16 @@ class Population:
         self.curr_gen = 0
         self.idv_tab = []
         for i in range(self.nbr_idv):
-            k = Individu()
-            for j in range(self.def_gen):
-                k.set_def_tree(randint(-self.grid_size, self.grid_size), randint(-self.grid_size, self.grid_size), j)
-                k.set_hit_tree(randint(-self.grid_size, self.grid_size), randint(-self.grid_size, self.grid_size), j)
+            k = Individu(self)
+            k.hit_tree = Node(None, 0, 0)
+            k.hit_tree.build_tree(10, self.grid_size)
             self.idv_tab.append(k)
 
+    def get_idv(self, index):
+        #TODO gestion erreur
+        return self.idv_tab[index]
 
-
-
+    def rmv_idv(self, index):
+        # TODO gestion erreur
+        self.idv_tab.pop(index)
 

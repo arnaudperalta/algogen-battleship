@@ -57,7 +57,7 @@ class Options(ttk.Frame):
                 "mut_%": self.mutation_chance.get(), "def_gen": self.def_gen.get(), "nbr_idv": self.nbr_idv.get(),
                 "grid_size": self.grid_size.get(), "ship_nbr": self.ship_number.get()}
         print(data)
-        with open('././cfg/option.json', 'w') as file:
+        with open('../cfg/option.json', 'w') as file:
             json.dump(data, file)
         file.close()
 
