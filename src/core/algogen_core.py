@@ -1,3 +1,13 @@
-class Game:
+from genetic import Population
+
+
+class Core:
     def __init__(self):
-        print("core")
+        # Lecture des paramètres
+        self.pop = Population()
+
+    def train(self):
+        return true
+
+    def clean(self):
+        return true

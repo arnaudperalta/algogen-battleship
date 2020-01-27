@@ -1,12 +1,16 @@
 from tkinter import *
 from tkinter import ttk
+from algogen_core import Core
 
 # Classe héritant de la classe Frame de tkinter
+
+# TODO quand on quitte le trainer il faut nettoyer tout le model car les options peuvent se faire modifier
 
 
 class Trainer(ttk.Frame):
     def __init__(self, base_app, model):
         super().__init__(base_app.master)
+        self.model = model
         self.base_app = base_app
         root = base_app.master
 
@@ -28,3 +32,12 @@ class Trainer(ttk.Frame):
     def clear(self):
         for widget in self.base_app.master.winfo_children():
             widget.destroy()
+
+    def fulltrain(self):
+        while self.model.train():
+            print(self.model.pop_info())
+
+    def steptrain(self):
+        if self.model.train():
+            print(self.model.pop_info())
+

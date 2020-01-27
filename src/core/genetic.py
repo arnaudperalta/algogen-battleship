@@ -1,5 +1,5 @@
-import json
 from node import Node
+import options as o
 
 
 class Individu:
@@ -18,23 +18,13 @@ class Individu:
 
 class Population:
     def __init__(self):
-        with open('././cfg/option.json', 'r') as file:
-            data = json.load(file)
-        # nbr de génération de la population
-        self.nbr_gen = data["nbr_gen"]
-        self.saved_percentage = data["saved_%"]
-        self.mutation_chance = data["mut_%"]
-        self.def_gen = data["def_gen"]
-        self.nbr_idv = data["nbr_idv"]
-        self.grid_size = data["grid_size"]
-        file.close()
         # génération actuelle
         self.curr_gen = 0
         self.idv_tab = []
-        for i in range(self.nbr_idv):
+        for i in range(o.options_nbr_idv):
             k = Individu(self)
             k.hit_tree = Node(None, 0, 0)
-            k.hit_tree.build_tree(10, self.grid_size)
+            k.hit_tree.build_tree(10, o.options_grid_size)
             self.idv_tab.append(k)
 
     def get_idv(self, index):

@@ -1,13 +1,18 @@
-import graphic.algogen_graphic as graphic
-import core.algogen_core as core
+import json
+from algogen_graphic import App
+from algogen_core import Core
+import options as o
 
 
 def main():
+    # Enregistrement des options en mémoire
+    o.init_option()
     # Instanciation du modèle
-    model = core.Game()
+    model = Core()
 
     # Instanciation de l'interface utilisateur
-    app = graphic.App(model)
+    app = App(model)
+    # Construction de l'interface graphique
     app.build()
 
 

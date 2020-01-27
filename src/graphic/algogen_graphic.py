@@ -34,7 +34,7 @@ class App(ttk.Frame):
         frame.pack(expand=YES)
 
         text_noms = Label(root, text="Arnaud Peralta, Yohann Goffart, Louis Pariente - Q1 2020",
-                          font=("Helvetica")).pack(side=BOTTOM)
+                          font="Helvetica").pack(side=BOTTOM)
 
     def training_draw(self):
         self.clear_frame()

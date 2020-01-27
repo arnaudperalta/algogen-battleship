@@ -2,31 +2,44 @@ import json
 from tkinter import ttk
 from tkinter import IntVar
 
+options_nbr_gen = 0
+options_saved_percentage = 0
+options_mutation_chance = 0
+options_def_gen = 0
+options_nbr_idv = 0
+options_grid_size = 0
+options_ship_number = 0
+
 
 class Options(ttk.Frame):
     def __init__(self, master=None, app=None):
-        with open('..//cfg/option.json', 'r') as file:
-            data = json.load(file)
         super().__init__(master)
         self.return_app = app
         self.nbr_gen = IntVar()
-        self.nbr_gen.set(data["nbr_gen"])
         self.saved_percentage = IntVar()
-        self.saved_percentage.set(data["saved_%"])
         self.mutation_chance = IntVar()
-        self.mutation_chance.set(data["mut_%"])
         self.def_gen = IntVar()
-        self.def_gen.set(data["def_gen"])
         self.nbr_idv = IntVar()
-        self.nbr_idv.set(data["nbr_idv"])
         self.grid_size = IntVar()
-        self.grid_size.set(data["grid_size"])
         self.ship_number = IntVar()
-        self.ship_number.set(data["ship_nbr"])
-        file.close()
 
     def build(self):
         root = self.master
+        global options_nbr_gen
+        self.nbr_gen.set(options_nbr_gen)
+        global options_saved_percentage
+        self.saved_percentage.set(options_saved_percentage)
+        global options_mutation_chance
+        self.mutation_chance.set(options_mutation_chance)
+        global options_def_gen
+        self.def_gen.set(options_def_gen)
+        global options_nbr_idv
+        self.nbr_idv.set(options_nbr_idv)
+        global options_grid_size
+        self.grid_size.set(options_grid_size)
+        global options_ship_number
+        self.ship_number.set(options_ship_number)
+
         # Liste d'options
         ttk.Label(root, text="Option de l'algorithme :").grid(row=0, column=1, columnspan=2)
         ttk.Label(root, text='Nombre de génération').grid(row=1, column=1)
@@ -52,16 +65,50 @@ class Options(ttk.Frame):
         # fin de liste
         root.mainloop()
 
-    def save_option(self):
-        data = {"nbr_gen": self.nbr_gen.get(), "saved_%": self.saved_percentage.get(),
-                "mut_%": self.mutation_chance.get(), "def_gen": self.def_gen.get(), "nbr_idv": self.nbr_idv.get(),
-                "grid_size": self.grid_size.get(), "ship_nbr": self.ship_number.get()}
-        print(data)
-        with open('../cfg/option.json', 'w') as file:
-            json.dump(data, file)
-        file.close()
-
     def return_call(self):
         for widget in self.return_app.master.winfo_children():
             widget.destroy()
         self.return_app.home_draw()
+
+    def save_option(self):
+        global options_nbr_gen
+        global options_saved_percentage
+        global options_mutation_chance
+        global options_def_gen
+        global options_nbr_idv
+        global options_grid_size
+        global options_ship_number
+        options_nbr_gen = self.nbr_gen.get()
+        options_saved_percentage = self.saved_percentage.get()
+        options_mutation_chance = self.mutation_chance.get()
+        options_def_gen = self.def_gen.get()
+        options_nbr_idv = self.nbr_idv.get()
+        options_grid_size = self.grid_size.get()
+        options_ship_number = self.ship_number.get()
+        data = {"nbr_gen": options_nbr_gen, "saved_%": options_saved_percentage,
+                "mut_%": options_mutation_chance, "def_gen": options_def_gen,
+                "nbr_idv": options_nbr_idv,
+                "grid_size": options_grid_size, "ship_nbr": options_ship_number}
+        with open('../cfg/option.json', 'w') as file:
+            json.dump(data, file)
+        file.close()
+
+
+def init_option():
+    with open('..//cfg/option.json', 'r') as file:
+        data = json.load(file)
+    global options_nbr_gen
+    global options_saved_percentage
+    global options_mutation_chance
+    global options_def_gen
+    global options_nbr_idv
+    global options_grid_size
+    global options_ship_number
+    options_nbr_gen = data["nbr_gen"]
+    options_saved_percentage = data["saved_%"]
+    options_mutation_chance = data["mut_%"]
+    options_def_gen = data["def_gen"]
+    options_nbr_idv = data["nbr_idv"]
+    options_grid_size = data["grid_size"]
+    options_ship_number = data["ship_nbr"]
+    file.close()

@@ -1,10 +1,10 @@
 from tkinter import *
 from tkinter import ttk
 import math
+import options as o
 
 BOARD_SIZE = 400
 BORDER_SIZE = 5
-CELLS_BY_LINE = 5
 PHASE_PLACEMENT = 0
 PHASE_TIR_ALLIE = 1
 PHASE_TIR_ENNEMI = 2
@@ -15,6 +15,7 @@ FONT_BORDER = 7
 class Board(ttk.Frame):
     def __init__(self, base_app):
         super().__init__(base_app.master)
+        self.cells_by_line = o.options_grid_size
         self.base_app = base_app
         root = base_app.master
 
@@ -51,32 +52,32 @@ class Board(ttk.Frame):
 
     def draw_grid(self, canvas, name):
         canvas.create_rectangle(BORDER_SIZE, BORDER_SIZE, BOARD_SIZE + BORDER_SIZE, BOARD_SIZE + BORDER_SIZE)
-        cell_size = BOARD_SIZE / CELLS_BY_LINE
+        cell_size = BOARD_SIZE / self.cells_by_line
         # Tracé des lignes
-        for i in range(1, CELLS_BY_LINE):
+        for i in range(1, self.cells_by_line):
             canvas.create_line(i * cell_size + BORDER_SIZE, BORDER_SIZE
                                , i * cell_size + BORDER_SIZE, BORDER_SIZE + BOARD_SIZE)
-        for i in range(1, CELLS_BY_LINE):
+        for i in range(1, self.cells_by_line):
             canvas.create_line(BORDER_SIZE, i * cell_size + BORDER_SIZE
                                , BORDER_SIZE + BOARD_SIZE, i * cell_size + BORDER_SIZE)
         # Mapping des cellules
-        for i in range(1, CELLS_BY_LINE):
-            for j in range(1, CELLS_BY_LINE):
+        for i in range(1, self.cells_by_line):
+            for j in range(1, self.cells_by_line):
                 if name == "left":
                     canvas.bind("<Button-1>", self.boardleft_callback)
                 else:
                     canvas.bind("<Button-1>", self.boardright_callback)
-        draw_grid_coords(canvas)
+        self.draw_grid_coords(canvas)
 
     def boardleft_callback(self, event):
         if self.phase == PHASE_PLACEMENT:
             # demande au model le resultat du tir puis paint la case selon la réponse
-            paint_cell(self.board_left, cell_coords(event.x, event.y), "grey")
+            self.paint_cell(self.board_left, self.cell_coords(event.x, event.y), "grey")
 
     def boardright_callback(self, event):
         if self.phase == PHASE_TIR_ALLIE:
             # demande au model le resultat du tir puis paint la case selon la réponse
-            paint_cell(self.board_right, cell_coords(event.x, event.y), "blue")
+            self.paint_cell(self.board_right, self.cell_coords(event.x, event.y), "blue")
 
     def back(self):
         self.clear()
@@ -91,38 +92,35 @@ class Board(ttk.Frame):
         self.phase = PHASE_TIR_ALLIE
         self.phase_label.configure(text="Phase de jeu : Tirez sur la grille ennemi.")
 
+    def paint_cell(self, canvas, coords, color):
+        if min(coords) < 0 or max(coords) > self.cells_by_line - 1:
+            return
+        cell_size = BOARD_SIZE / self.cells_by_line
+        canvas.create_rectangle(BORDER_SIZE + (coords[0]) * cell_size
+                                , BORDER_SIZE + (coords[1]) * cell_size
+                                , BORDER_SIZE + (coords[0] + 1) * cell_size
+                                , BORDER_SIZE + (coords[1] + 1) * cell_size
+                                , fill=color)
+        self.draw_grid_coords(canvas)
 
-def paint_cell(canvas, coords, color):
-    if min(coords) < 0 or max(coords) > CELLS_BY_LINE - 1:
-        return
-    cell_size = BOARD_SIZE / CELLS_BY_LINE
-    canvas.create_rectangle(BORDER_SIZE + (coords[0]) * cell_size
-                            , BORDER_SIZE + (coords[1]) * cell_size
-                            , BORDER_SIZE + (coords[0] + 1) * cell_size
-                            , BORDER_SIZE + (coords[1] + 1) * cell_size
-                            , fill=color)
-    draw_grid_coords(canvas)
+    # Transforme des coordonnées canvas en couple x,y de coords cellules
+    def cell_coords(self, x, y):
+        return [math.floor((x - BORDER_SIZE) * self.cells_by_line / BOARD_SIZE),
+                math.floor((y - BORDER_SIZE) * self.cells_by_line / BOARD_SIZE)]
 
-
-# Transforme des coordonnées canvas en couple x,y de coords cellules
-def cell_coords(x, y):
-    return [math.floor((x - BORDER_SIZE) * CELLS_BY_LINE / BOARD_SIZE),
-            math.floor((y - BORDER_SIZE) * CELLS_BY_LINE / BOARD_SIZE)]
-
-
-def draw_grid_coords(canvas):
-    cell_size = BOARD_SIZE / CELLS_BY_LINE
-    x_coord = "A"
-    y_coord = "0"
-    canvas.delete("coord")
-    canvas.create_text(BORDER_SIZE + FONT_BORDER * 2, BORDER_SIZE + FONT_BORDER, font=("Helvetica", 12)
-                       , text=x_coord + " / " + y_coord, tags="coord")
-    # Tracé des lignes
-    for i in range(1, CELLS_BY_LINE):
-        x_coord = chr(ord(x_coord) + 1)
-        canvas.create_text(i * cell_size + BORDER_SIZE + FONT_BORDER, BORDER_SIZE + FONT_BORDER
-                           , font=("Helvetica", 12), text=x_coord, tags="coord")
-    for i in range(1, CELLS_BY_LINE):
-        y_coord = chr(ord(y_coord) + 1)
-        canvas.create_text(BORDER_SIZE + FONT_BORDER, i * cell_size + BORDER_SIZE + FONT_BORDER
-                           , font=("Helvetica", 12), text=y_coord, tags="coord")
+    def draw_grid_coords(self, canvas):
+        cell_size = BOARD_SIZE / self.cells_by_line
+        x_coord = "A"
+        y_coord = "0"
+        canvas.delete("coord")
+        canvas.create_text(BORDER_SIZE + FONT_BORDER * 2, BORDER_SIZE + FONT_BORDER, font=("Helvetica", 12)
+                           , text=x_coord + " / " + y_coord, tags="coord")
+        # Tracé des lignes
+        for i in range(1, self.cells_by_line):
+            x_coord = chr(ord(x_coord) + 1)
+            canvas.create_text(i * cell_size + BORDER_SIZE + FONT_BORDER, BORDER_SIZE + FONT_BORDER
+                               , font=("Helvetica", 12), text=x_coord, tags="coord")
+        for i in range(1, self.cells_by_line):
+            y_coord = chr(ord(y_coord) + 1)
+            canvas.create_text(BORDER_SIZE + FONT_BORDER, i * cell_size + BORDER_SIZE + FONT_BORDER
+                               , font=("Helvetica", 12), text=y_coord, tags="coord")
