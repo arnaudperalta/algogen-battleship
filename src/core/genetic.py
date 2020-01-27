@@ -3,35 +3,32 @@ import options as o
 
 
 class Individu:
-    def __init__(self, p):
+    def __init__(self, pop):
         # ensemble de décision après un tir
         self.hit_tree = None
         # population correspondant à l'individu
-        self.population = p
+        self.population = pop
+        # Création de l'arbre de décision associé à l'individu
+        self.decision_tree = Node()
 
-    def get_all_hit_tree(self):
-        return self.hit_tree
-
-
-   # TODO MUTATION ET REPRODUCTION
+    # TODO MUTATION ET REPRODUCTION
 
 
+# Classe réprésentant une population (un ensemble d'Individu)
+# On associe à une population sa génération, désignant son avancé génétique
 class Population:
-    def __init__(self):
-        # génération actuelle
-        self.curr_gen = 0
+    def __init__(self, size):
+        # Le numéro de la génération
+        self.generation = 1
+        # Le tableau ou seront stocké les Individus
         self.idv_tab = []
-        for i in range(o.options_nbr_idv):
-            k = Individu(self)
-            k.hit_tree = Node(None, 0, 0)
-            k.hit_tree.build_tree(10, o.options_grid_size)
-            self.idv_tab.append(k)
+        for i in range(size):
+            self.idv_tab.append(Individu(self))
 
     def get_idv(self, index):
-        #TODO gestion erreur
+        # TODO gestion erreur
         return self.idv_tab[index]
 
     def rmv_idv(self, index):
         # TODO gestion erreur
         self.idv_tab.pop(index)
-
