@@ -6,6 +6,7 @@ EMPTY_CELL = 0
 BOAT_CELL = 1
 HIT_CELL = 2
 DROWN_CELL = 3
+MISS_CELL = 4
 # Phases de jeu
 BOATS_PLACEMENT = 0
 ATTACK = 1
@@ -72,6 +73,26 @@ class Game:
             board[boat_coords[i + 1][0]][boat_coords[i + 1][1]] = childs[i]
         return True
 
+    def attack(self, board_name, coords):
+        if board_name == "left":
+            board = self.board1
+        else:
+            board = self.board2
+        target = board[coords[0]][coords[1]]
+        if target is None:
+            board[coords[0]][coords[1]] = MISS_CELL
+            return False
+        if target == MISS_CELL:
+            return False
+        if target.hit():
+            print("tata")
+            for i in range(len(board)):
+                for j in range(len(board)):
+                    if isinstance(board[i][j], Boat) and board[i][j].state == BOAT_CELL:
+                        print(board[i][j])
+                        return False
+        return True
+
     # Renvoie un plateau avec des valeurs prêtes pour le module d'affichage
     def get_display_board(self, name):
         result = []
@@ -84,13 +105,39 @@ class Game:
             for j in range(len(board)):
                 if board[i][j] is None:
                     line.append(EMPTY_CELL)
+                elif board[i][j] == MISS_CELL:
+                    line.append(MISS_CELL)
                 else:
                     line.append(board[i][j].get_state())
             result.append(line)
         return result
 
+    # Verifie si un bateau est placé pour chaque joueur et renvoie true si la partie commence
     def game_begin(self):
+        boat = False
+        # Vérification du board 1
+        for i in range(len(self.board1)):
+            for j in range(len(self.board1)):
+                if self.board1[i][j] is not None:
+                    boat = True
+                    break
+            if boat:
+                break
+        if not boat:
+            return False
+        # Vérification du board 2
+        boat = False
+        for i in range(len(self.board2)):
+            for j in range(len(self.board2)):
+                if self.board2[i][j] is not None:
+                    boat = True
+                    break
+            if boat:
+                break
+        if not boat:
+            return False
         self.game_state = ATTACK
+        return True
 
     def game_reset(self):
         self.__init__()
@@ -113,27 +160,32 @@ class Boat:
     def get_state(self):
         return self.state
 
+    def set_state(self, s):
+        self.state = s
+
     def get_childs(self):
         return self.child
 
     def hit(self):
         def is_all_hits(array):
             for i in range(len(array)):
-                if array.get_state() == BOAT_CELL:
+                if array[i].get_state() == BOAT_CELL:
                     return False
             return True
 
-        def set_all_drowned(array):
-            self.state = DROWN_CELL
-            for i in range(len(array)):
-                array[i] = DROWN_CELL
+        def set_all_drowned(parent):
+            parent.state = DROWN_CELL
+            for i in range(len(parent.child)):
+                parent.child[i].state = DROWN_CELL
 
+        self.state = HIT_CELL
         if self.parent is None:
             if self.state == HIT_CELL and is_all_hits(self.child):
                 set_all_drowned(self)
         else:
             if self.parent.get_state() == HIT_CELL and is_all_hits(self.parent.child):
                 set_all_drowned(self.parent)
+        return True
 
 
 def create_board(size):

@@ -90,15 +90,11 @@ class Board(ttk.Frame):
 
     def boardright_callback(self, event):
         if self.game.game_state == core.ATTACK:
-            result = self.game.game_action("right", self.cell_coords(event.x, event.y), self.boat_size, self.orientation)
-            print(result)
-            if result == "drown":
-                color = "brown"
-            elif result == "hit":
-                color = "red"
-            elif result == "miss":
-                color = "blue"
-            self.paint_cell(self.board_right, self.cell_coords(event.x, event.y), color)
+            res = self.game.attack("right", self.cell_coords(event.x, event.y))
+            self.game.get_display_board("right")
+            self.render_board(self.board_right, self.game.get_display_board("right"), ennemy=True)
+            if res:
+                self.game_won("gauche")
 
     def back(self):
         self.clear()
@@ -109,17 +105,24 @@ class Board(ttk.Frame):
             widget.destroy()
 
     def ready_clicked(self):
-        self.button_ready.destroy()
-        self.game.game_begin()
-        self.phase_label.configure(text="Phase de jeu : Tirez sur la grille ennemi.")
+        if self.game.game_begin():
+            self.button_ready.destroy()
+            self.orientation_name.destroy()
+            self.orientation_menu.destroy()
+            self.boat_size_name.destroy()
+            self.boat_size_entry.destroy()
+            self.phase_label.configure(text="Phase de jeu : Tirez sur la grille ennemi.")
 
-    def render_board(self, canvas, board):
+    def render_board(self, canvas, board, ennemy=False):
         for i in range(len(board)):
             for j in range(len(board)):
                 if board[i][j] == core.EMPTY_CELL:
                     color = "white"
                 elif board[i][j] == core.BOAT_CELL:
-                    color = "grey"
+                    if ennemy is True:
+                        color = "white"
+                    else:
+                        color = "grey"
                 elif board[i][j] == core.HIT_CELL:
                     color = "red"
                 elif board[i][j] == core.DROWN_CELL:
@@ -160,3 +163,8 @@ class Board(ttk.Frame):
             y_coord = chr(ord(y_coord) + 1)
             canvas.create_text(BORDER_SIZE + FONT_BORDER, i * cell_size + BORDER_SIZE + FONT_BORDER
                                , font=("Helvetica", 12), text=y_coord, tags="coord")
+
+    def game_won(self, winner):
+        self.board_left.unbind("<Button 1>")
+        self.board_right.unbind("<Button 1>")
+        self.phase_label.configure(text="Winner : joueur " + winner)
