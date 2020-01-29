@@ -1,5 +1,7 @@
 from tkinter import *
 from tkinter import ttk
+from algogen_core import Game
+import algogen_core as core
 import math
 import options as o
 
@@ -16,6 +18,7 @@ class Board(ttk.Frame):
     def __init__(self, base_app):
         super().__init__(base_app.master)
         self.cells_by_line = o.options_grid_size
+        self.game = Game()
         self.base_app = base_app
         root = base_app.master
 
@@ -31,8 +34,15 @@ class Board(ttk.Frame):
         self.grey_label = Label(root, text="Case grise : Pièce de bateau")
         self.button_ready = ttk.Button(root, text="Prêt", command=self.ready_clicked)
         self.phase_label = Label(root, text="Phase de jeu : Placez vos bateaux.")
-        # On désigne une phase de jeu
-        self.phase = PHASE_PLACEMENT
+        self.boat_size_name = Label(root, text="Taille bateau")
+        self.boat_size = IntVar()
+        self.boat_size.set(3)
+        self.boat_size_entry = Entry(root, textvariable=self.boat_size, width=1)
+        self.orientation_name = Label(root, text="Orientation")
+        self.orientation = StringVar()
+        self.orientation_choices = {"Nord", "Nord", "Ouest", "Est", "Sud"}
+        self.orientation.set("Nord")
+        self.orientation_menu = ttk.OptionMenu(root, self.orientation, *self.orientation_choices)
 
     def draw(self):
         self.button_back.grid(row=0, column=0, sticky=W)
@@ -44,8 +54,12 @@ class Board(ttk.Frame):
         self.brown_label.grid(row=2, column=1, sticky=W)
         self.yellow_label.grid(row=2, column=2)
         self.grey_label.grid(row=2, column=3)
-        self.button_ready.grid(row=3, column=1)
+        self.button_ready.grid(row=3, column=3)
         self.phase_label.grid(row=3, column=0, sticky=W)
+        self.boat_size_name.grid(row=3, column=1, sticky=W)
+        self.boat_size_entry.grid(row=3, column=1)
+        self.orientation_name.grid(row=3, column=2, sticky=W)
+        self.orientation_menu.grid(row=3, column=2, sticky=E)
 
         self.draw_grid(self.board_left, "left")
         self.draw_grid(self.board_right, "right")
@@ -61,23 +75,30 @@ class Board(ttk.Frame):
             canvas.create_line(BORDER_SIZE, i * cell_size + BORDER_SIZE
                                , BORDER_SIZE + BOARD_SIZE, i * cell_size + BORDER_SIZE)
         # Mapping des cellules
-        for i in range(1, self.cells_by_line):
-            for j in range(1, self.cells_by_line):
-                if name == "left":
-                    canvas.bind("<Button-1>", self.boardleft_callback)
-                else:
-                    canvas.bind("<Button-1>", self.boardright_callback)
+        if name == "left":
+            canvas.bind("<Button-1>", self.boardleft_callback)
+        else:
+            canvas.bind("<Button-1>", self.boardright_callback)
         self.draw_grid_coords(canvas)
 
     def boardleft_callback(self, event):
-        if self.phase == PHASE_PLACEMENT:
-            # demande au model le resultat du tir puis paint la case selon la réponse
-            self.paint_cell(self.board_left, self.cell_coords(event.x, event.y), "grey")
+        if self.game.game_state == core.BOATS_PLACEMENT:
+            res = self.game.place_boat("left", self.cell_coords(event.x, event.y), self.boat_size.get()
+                                       , self.orientation.get())
+            if res is not False:
+                self.render_board(self.board_left, self.game.get_display_board("left"))
 
     def boardright_callback(self, event):
-        if self.phase == PHASE_TIR_ALLIE:
-            # demande au model le resultat du tir puis paint la case selon la réponse
-            self.paint_cell(self.board_right, self.cell_coords(event.x, event.y), "blue")
+        if self.game.game_state == core.ATTACK:
+            result = self.game.game_action("right", self.cell_coords(event.x, event.y), self.boat_size, self.orientation)
+            print(result)
+            if result == "drown":
+                color = "brown"
+            elif result == "hit":
+                color = "red"
+            elif result == "miss":
+                color = "blue"
+            self.paint_cell(self.board_right, self.cell_coords(event.x, event.y), color)
 
     def back(self):
         self.clear()
@@ -89,8 +110,23 @@ class Board(ttk.Frame):
 
     def ready_clicked(self):
         self.button_ready.destroy()
-        self.phase = PHASE_TIR_ALLIE
+        self.game.game_begin()
         self.phase_label.configure(text="Phase de jeu : Tirez sur la grille ennemi.")
+
+    def render_board(self, canvas, board):
+        for i in range(len(board)):
+            for j in range(len(board)):
+                if board[i][j] == core.EMPTY_CELL:
+                    color = "white"
+                elif board[i][j] == core.BOAT_CELL:
+                    color = "grey"
+                elif board[i][j] == core.HIT_CELL:
+                    color = "red"
+                elif board[i][j] == core.DROWN_CELL:
+                    color = "brown"
+                else:
+                    color = "blue"
+                self.paint_cell(canvas, [i, j], color)
 
     def paint_cell(self, canvas, coords, color):
         if min(coords) < 0 or max(coords) > self.cells_by_line - 1:
