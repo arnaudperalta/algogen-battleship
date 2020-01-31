@@ -93,8 +93,14 @@ class Board(ttk.Frame):
             res = self.game.attack("right", self.cell_coords(event.x, event.y))
             self.game.get_display_board("right")
             self.render_board(self.board_right, self.game.get_display_board("right"), ennemy=True)
+            if res is None:
+                # Case déja clické avant
+                return
             if res:
                 self.game_won("gauche")
+            else:
+                self.ask_ia()
+                self.render_board(self.board_left, self.game.get_display_board("left"), ennemy=False)
 
     def back(self):
         self.clear()
@@ -168,3 +174,7 @@ class Board(ttk.Frame):
         self.board_left.unbind("<Button 1>")
         self.board_right.unbind("<Button 1>")
         self.phase_label.configure(text="Winner : joueur " + winner)
+
+    def ask_ia(self):
+        if self.base_app.get_model().play(self.game):
+            self.game_won("right")

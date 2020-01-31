@@ -9,6 +9,10 @@ class App(ttk.Frame):
     def __init__(self, model):
         super().__init__(None)
         self.pack()
+        self.model = model
+
+    def get_model(self):
+        return self.model
 
     def build(self):
         root = self.master

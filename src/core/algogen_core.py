@@ -18,12 +18,13 @@ class Core:
     def __init__(self):
         # Lecture des paramètres
         self.pop = Population(o.options_nbr_idv)
+        self.bot = self.pop.get_idv(0)
 
     def train(self):
         return 0
 
-    def play(self):
-        return 0
+    def play(self, game, to_attack="left"):
+        return game.attack(to_attack, self.bot.play(game, to_attack))
 
 
 # Classe simulant une partie
@@ -82,14 +83,12 @@ class Game:
         if target is None:
             board[coords[0]][coords[1]] = MISS_CELL
             return False
-        if target == MISS_CELL:
-            return False
+        if not isinstance(target, Boat) or target.state != BOAT_CELL:
+            return None
         if target.hit():
-            print("tata")
             for i in range(len(board)):
                 for j in range(len(board)):
                     if isinstance(board[i][j], Boat) and board[i][j].state == BOAT_CELL:
-                        print(board[i][j])
                         return False
         return True
 
@@ -141,6 +140,18 @@ class Game:
 
     def game_reset(self):
         self.__init__()
+
+    def get_free_cells(self, board_name):
+        cells = []
+        if "left" == board_name:
+            board = self.board1
+        else:
+            board = self.board2
+        for i in range(len(board)):
+            for j in range(len(board)):
+                if board[i][j] is None or isinstance(board[i][j], Boat) and board[i][j].state == BOAT_CELL:
+                    cells.append([i, j])
+        return cells
 
 
 # Classe qui a uné définition récursive, les enfants pointent vers le parent.
