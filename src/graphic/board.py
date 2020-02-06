@@ -97,10 +97,10 @@ class Board(ttk.Frame):
             res = self.game.attack("right", self.cell_coords(event.x, event.y))
             self.game.get_display_board("right")
             self.render_board(self.board_right, self.game.get_display_board("right"), ennemy=True)
-            if res is None:
+            if res == core.NO_ACTION:
                 # Case déja clické avant
                 return
-            if res:
+            if res == core.WIN_ACTION:
                 self.game_won("gauche")
             else:
                 self.ask_ia()
@@ -188,5 +188,6 @@ class Board(ttk.Frame):
 
     # Notifie l'IA qu'il doit jouer
     def ask_ia(self):
-        if self.base_app.get_model().play(self.game):
+        print("dtozd")
+        if self.base_app.get_model().play(self.game) == core.WIN_ACTION:
             self.game_won("right")
