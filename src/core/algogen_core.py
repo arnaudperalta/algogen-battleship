@@ -31,7 +31,11 @@ class Core:
 
     # Return true si la partie est gagnée
     def play(self, game, to_attack="left"):
-        res = game.attack(to_attack, self.bot.play(game, to_attack))
+        res = game.attack(to_attack, self.bot.play(game))
+        if res == HIT_ACTION:
+            self.bot.notify = True
+        if res == DROWN_ACTION:
+            self.bot.notify_drown = True
         if res == WIN_ACTION:
             return True
 

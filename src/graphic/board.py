@@ -188,6 +188,5 @@ class Board(ttk.Frame):
 
     # Notifie l'IA qu'il doit jouer
     def ask_ia(self):
-        print("dtozd")
-        if self.base_app.get_model().play(self.game) == core.WIN_ACTION:
+        if self.base_app.get_model().play(self.game):
             self.game_won("right")

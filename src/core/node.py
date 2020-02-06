@@ -5,7 +5,8 @@ MAX_TREE_DEPTH = 10
 
 
 class Node:
-    def __init__(self, previous=None, offset=(0, 0), depth=1):
+    def __init__(self, previous=None, offset=(randint(-o.options_grid_size, o.options_grid_size),
+                                              randint(-o.options_grid_size, o.options_grid_size)), depth=1):
         self.parent = previous
         self.depth = depth
         # Couple d'entier representant un offset par rapport au coords du premier tir
