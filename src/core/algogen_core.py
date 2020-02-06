@@ -27,12 +27,13 @@ class Core:
         return game.attack(to_attack, self.bot.play(game, to_attack))
 
 
-# Classe simulant une partie
+# Classe simulant une partie de bataille navale
 class Game:
     def __init__(self):
         self.game_state = BOATS_PLACEMENT
         self.board1 = create_board(o.options_grid_size)
         self.board2 = create_board(o.options_grid_size)
+        # On place un bateau sur le board de droite
         self.place_boat("right", [0, 0], 3, "Sud")
 
     # Place le bateau en crééant plusieurs fois une instance de boat sur un board, renvoie true si
@@ -74,6 +75,10 @@ class Game:
             board[boat_coords[i + 1][0]][boat_coords[i + 1][1]] = childs[i]
         return True
 
+    # Tir un boulet sur un board donné a des coordonnées données
+    # renvoie False si on miss sur une case vierge
+    # renvoie True si un bateau est otuché
+    # renvoie None quand la case sur laquelle on a tiré était déja touché ou miss
     def attack(self, board_name, coords):
         if board_name == "left":
             board = self.board1
@@ -93,6 +98,7 @@ class Game:
         return True
 
     # Renvoie un plateau avec des valeurs prêtes pour le module d'affichage
+    # C'est à dire qu'il est libre de toute référence, seulement constitué d'entier
     def get_display_board(self, name):
         result = []
         if name == "left":
@@ -138,9 +144,11 @@ class Game:
         self.game_state = ATTACK
         return True
 
+    # Recommence une partie en faisant une ré-éxecution du constructeur
     def game_reset(self):
         self.__init__()
 
+    # Permet d'obtenir une liste composée des coordonnées des cellules libres
     def get_free_cells(self, board_name):
         cells = []
         if "left" == board_name:
@@ -164,10 +172,12 @@ class Boat:
         if parent is None:
             self.ini_boat()
 
+    # Initialise le bateau parent
     def ini_boat(self):
         for i in range(self.size - 1):
             self.child.append(Boat(self.size, parent=self))
 
+    # Retourne l'état du bateau
     def get_state(self):
         return self.state
 
@@ -177,6 +187,8 @@ class Boat:
     def get_childs(self):
         return self.child
 
+    # Touche le bateau pour le le mettre dans un état touché puis verifie si sa famille
+    # n'est pas entierement touché pour tout coulé
     def hit(self):
         def is_all_hits(array):
             for i in range(len(array)):
@@ -199,6 +211,7 @@ class Boat:
         return True
 
 
+# Créer un board d'une taille size
 def create_board(size):
     board = []
     for i in range(0, size):
