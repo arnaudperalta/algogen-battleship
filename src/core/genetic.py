@@ -65,6 +65,10 @@ class Individu:
         (x, y) = ((x + a) % o.options_grid_size, (y + b) % o.options_grid_size)
         return x, y
 
+    def fitness(self):
+        return self.shoot_nb
+
+
     # TODO MUTATION ET REPRODUCTION
 
 
