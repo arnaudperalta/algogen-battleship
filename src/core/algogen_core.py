@@ -7,6 +7,12 @@ BOAT_CELL = 1
 HIT_CELL = 2
 DROWN_CELL = 3
 MISS_CELL = 4
+# Action
+NO_ACTION = 0
+MISS_ACTION = 1
+HIT_ACTION = 2
+DROWN_ACTION = 3
+WIN_ACTION = 4
 # Phases de jeu
 BOATS_PLACEMENT = 0
 ATTACK = 1
@@ -23,8 +29,11 @@ class Core:
     def train(self):
         return 0
 
+    # Return true si la partie est gagnée
     def play(self, game, to_attack="left"):
-        return game.attack(to_attack, self.bot.play(game, to_attack))
+        res = game.attack(to_attack, self.bot.play(game, to_attack))
+        if res == WIN_ACTION:
+            return True
 
 
 # Classe simulant une partie de bataille navale
@@ -76,9 +85,7 @@ class Game:
         return True
 
     # Tir un boulet sur un board donné a des coordonnées données
-    # renvoie False si on miss sur une case vierge
-    # renvoie True si un bateau est otuché
-    # renvoie None quand la case sur laquelle on a tiré était déja touché ou miss
+    # Renvoie l'action approprié
     def attack(self, board_name, coords):
         if board_name == "left":
             board = self.board1
@@ -87,15 +94,17 @@ class Game:
         target = board[coords[0]][coords[1]]
         if target is None:
             board[coords[0]][coords[1]] = MISS_CELL
-            return False
+            return MISS_ACTION
         if not isinstance(target, Boat) or target.state != BOAT_CELL:
-            return None
+            return NO_ACTION
         if target.hit():
             for i in range(len(board)):
                 for j in range(len(board)):
                     if isinstance(board[i][j], Boat) and board[i][j].state == BOAT_CELL:
-                        return False
-        return True
+                        return DROWN_ACTION
+            return WIN_ACTION
+        else:
+            return HIT_ACTION
 
     # Renvoie un plateau avec des valeurs prêtes pour le module d'affichage
     # C'est à dire qu'il est libre de toute référence, seulement constitué d'entier
@@ -189,6 +198,7 @@ class Boat:
 
     # Touche le bateau pour le le mettre dans un état touché puis verifie si sa famille
     # n'est pas entierement touché pour tout coulé
+    # retourne true si coulé, sinon retourne false
     def hit(self):
         def is_all_hits(array):
             for i in range(len(array)):
@@ -205,10 +215,12 @@ class Boat:
         if self.parent is None:
             if self.state == HIT_CELL and is_all_hits(self.child):
                 set_all_drowned(self)
+                return True
         else:
             if self.parent.get_state() == HIT_CELL and is_all_hits(self.parent.child):
                 set_all_drowned(self.parent)
-        return True
+                return True
+        return False
 
 
 # Créer un board d'une taille size

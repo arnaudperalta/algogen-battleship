@@ -11,9 +11,9 @@ PHASE_PLACEMENT = 0
 PHASE_TIR_ALLIE = 1
 PHASE_TIR_ENNEMI = 2
 FONT_BORDER = 7
+
+
 # Classe héritant de la classe Frame de tkinter
-
-
 class Board(ttk.Frame):
     def __init__(self, base_app):
         super().__init__(base_app.master)
@@ -44,6 +44,7 @@ class Board(ttk.Frame):
         self.orientation.set("Nord")
         self.orientation_menu = ttk.OptionMenu(root, self.orientation, *self.orientation_choices)
 
+    # Place les éléments graphiques dans la fenêtre
     def draw(self):
         self.button_back.grid(row=0, column=0, sticky=W)
         self.board_left_name.grid(row=0, column=1, sticky=W)
@@ -64,6 +65,7 @@ class Board(ttk.Frame):
         self.draw_grid(self.board_left, "left")
         self.draw_grid(self.board_right, "right")
 
+    # Dessine une grille sur le canvas donné
     def draw_grid(self, canvas, name):
         canvas.create_rectangle(BORDER_SIZE, BORDER_SIZE, BOARD_SIZE + BORDER_SIZE, BOARD_SIZE + BORDER_SIZE)
         cell_size = BOARD_SIZE / self.cells_by_line
@@ -81,6 +83,7 @@ class Board(ttk.Frame):
             canvas.bind("<Button-1>", self.boardright_callback)
         self.draw_grid_coords(canvas)
 
+    # Fonction callback appellé sur un click du canvas gauche
     def boardleft_callback(self, event):
         if self.game.game_state == core.BOATS_PLACEMENT:
             res = self.game.place_boat("left", self.cell_coords(event.x, event.y), self.boat_size.get()
@@ -88,6 +91,7 @@ class Board(ttk.Frame):
             if res is not False:
                 self.render_board(self.board_left, self.game.get_display_board("left"))
 
+    # Fonction callback appellé sur un click du canvas droite
     def boardright_callback(self, event):
         if self.game.game_state == core.ATTACK:
             res = self.game.attack("right", self.cell_coords(event.x, event.y))
@@ -102,14 +106,17 @@ class Board(ttk.Frame):
                 self.ask_ia()
                 self.render_board(self.board_left, self.game.get_display_board("left"), ennemy=False)
 
+    # Retourne dans le menu
     def back(self):
         self.clear()
         self.base_app.home_draw()
 
+    # Nettoie la fenêtre des éléments graphiques
     def clear(self):
         for widget in self.base_app.master.winfo_children():
             widget.destroy()
 
+    # Fonction executé lorsque le joueurr est prêt à jouer et a cliqué sur le bouton ready
     def ready_clicked(self):
         if self.game.game_begin():
             self.button_ready.destroy()
@@ -119,6 +126,7 @@ class Board(ttk.Frame):
             self.boat_size_entry.destroy()
             self.phase_label.configure(text="Phase de jeu : Tirez sur la grille ennemi.")
 
+    # Ré-affiche completement un board en mettant a jour toute les cellules
     def render_board(self, canvas, board, ennemy=False):
         for i in range(len(board)):
             for j in range(len(board)):
@@ -137,6 +145,7 @@ class Board(ttk.Frame):
                     color = "blue"
                 self.paint_cell(canvas, [i, j], color)
 
+    # Colorie une cellule d'un board donné à une coordonné donnée
     def paint_cell(self, canvas, coords, color):
         if min(coords) < 0 or max(coords) > self.cells_by_line - 1:
             return
@@ -153,6 +162,7 @@ class Board(ttk.Frame):
         return [math.floor((x - BORDER_SIZE) * self.cells_by_line / BOARD_SIZE),
                 math.floor((y - BORDER_SIZE) * self.cells_by_line / BOARD_SIZE)]
 
+    # Affiche les coorfonnées graphiques sur le canvas donné
     def draw_grid_coords(self, canvas):
         cell_size = BOARD_SIZE / self.cells_by_line
         x_coord = "A"
@@ -170,11 +180,13 @@ class Board(ttk.Frame):
             canvas.create_text(BORDER_SIZE + FONT_BORDER, i * cell_size + BORDER_SIZE + FONT_BORDER
                                , font=("Helvetica", 12), text=y_coord, tags="coord")
 
+    # Signal une victoire d'un joueur
     def game_won(self, winner):
         self.board_left.unbind("<Button 1>")
         self.board_right.unbind("<Button 1>")
         self.phase_label.configure(text="Winner : joueur " + winner)
 
+    # Notifie l'IA qu'il doit jouer
     def ask_ia(self):
         if self.base_app.get_model().play(self.game):
             self.game_won("right")
