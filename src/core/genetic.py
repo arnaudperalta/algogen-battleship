@@ -68,6 +68,10 @@ class Individu:
     def fitness(self):
         return self.shoot_nb
 
+    @staticmethod
+    def merge(idv1, idv2):
+        return 0
+
 
     # TODO MUTATION ET REPRODUCTION
 
@@ -80,6 +84,7 @@ class Population:
         self.generation = 1
         # Le tableau ou seront stocké les Individus
         self.idv_tab = []
+        self.fit_tab = []
         for i in range(size):
             self.idv_tab.append(Individu(self))
 
@@ -90,3 +95,6 @@ class Population:
     def rmv_idv(self, index):
         # TODO gestion erreur
         self.idv_tab.pop(index)
+
+    def mutate(self):
+        return 0

@@ -1,4 +1,6 @@
 from genetic import Population
+from genetic import Individu
+from random import randint
 import options as o
 
 # Etats des cellules
@@ -27,6 +29,31 @@ class Core:
         self.bot = self.pop.get_idv(0)
 
     def train(self):
+        # TODO call des fonctions plutot que d'édit direct les variables
+        self.pop.fit_tab = []
+        for i in range(o.options_nbr_idv):
+            self.bot = self.pop.idv_tab[i]
+            self.bot.shoot_nb = 0
+            game = Game()
+            game.place_boat("right", [0, 0], 3, "Sud")
+            game.place_boat("left", [0, 0], 3, "Sud")
+            game.game_begin()
+            ended = False
+            while not ended:
+                ended = self.play(game, "left")
+            self.pop.fit_tab.append((i, self.bot.fitness()))
+        self.pop.sort(key=self.sortSecond, reverse=True)
+        saved = (o.options_saved_percentage / 100) * o.options_nbr_idv
+        new_idv_tab = []
+        for i in range(saved):
+            (x, y) = self.pop.fit_tab[i]
+            new_idv_tab.append(self.pop.idv_tab[x])
+        for i in range(o.options_nbr_idv - saved):
+            idv1 = new_idv_tab[randint(0, saved - 1)]
+            idv2 = new_idv_tab[randint(0, saved - 1)]
+            new_idv_tab.append(Individu.merge(idv1, idv2))
+        self.pop.idv_tab = new_idv_tab
+        self.pop.mutate()
         return 0
 
     # Return true si la partie est gagnée
@@ -40,19 +67,20 @@ class Core:
                 self.bot.notify_drown = True
             if res == WIN_ACTION:
                 return True
+            return False
         else:
-            self.play(game, to_attack)
+            return self.play(game, to_attack)
+
+    def sortSecond(self, val):
+        return val[1]
 
 
-
-# Classe simulant une partie de bataille navale
+    # Classe simulant une partie de bataille navale
 class Game:
     def __init__(self):
         self.game_state = BOATS_PLACEMENT
         self.board1 = create_board(o.options_grid_size)
         self.board2 = create_board(o.options_grid_size)
-        # On place un bateau sur le board de droite
-        self.place_boat("right", [0, 0], 3, "Sud")
 
     # Place le bateau en crééant plusieurs fois une instance de boat sur un board, renvoie true si
     # le bateau a bien été placé
