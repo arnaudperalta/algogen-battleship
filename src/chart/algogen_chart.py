@@ -34,12 +34,6 @@ class Chart(ttk.Frame):
         canvas = FigureCanvasTkAgg(figure, root)
         canvas.get_tk_widget().grid(row=1, column=0, padx=10, pady=10)
 
-        """
-        figure2 = Figure(figsize=(4, 4), dpi=100)
-        figure2.add_subplot(1, 1, 1)
-        canvas2 = FigureCanvasTkAgg(figure,root)
-        canvas2.get_tk_widget().grid(row=1, column=1, padx= 3)
-        """
         ttk.Button(root, text='Retour', command=self.return_call).grid(row=0, column=0, sticky=W)
 
         root.mainloop()
