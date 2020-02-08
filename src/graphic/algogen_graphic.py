@@ -1,5 +1,7 @@
 from tkinter import ttk
 from tkinter import *
+
+from algogen_chart import Chart
 from board import Board
 from trainer import Trainer
 from options import Options
@@ -30,14 +32,15 @@ class App(ttk.Frame):
         title.pack()
         # Frame contenant les 5 boutons princpaux du menu
         frame = Frame(root)
-        play_button = ttk.Button(frame, text='Jouer vs IA Génétique', command=self.play_vs_ia, width=20).pack()
-        ia_button = ttk.Button(frame, text='IA vs IA', command=root.quit, width=20).pack()
-        train_button = ttk.Button(frame, text='Entraîner IA Génétique', command=self.training_draw, width=20).pack()
-        options_button = ttk.Button(frame, text='Options', command=self.options_draw, width=20).pack(pady=5)
-        quit_button = ttk.Button(frame, text='Quitter', command=root.destroy, width=20).pack(pady=5)
+        ttk.Button(frame, text='Jouer vs IA Génétique', command=self.play_vs_ia, width=20).pack()
+        ttk.Button(frame, text='IA vs IA', command=root.quit, width=20).pack()
+        ttk.Button(frame, text='Entraîner IA Génétique', command=self.training_draw, width=20).pack()
+        ttk.Button(frame, text='Statistiques', command=self.chart, width=20).pack()
+        ttk.Button(frame, text='Options', command=self.options_draw, width=20).pack(pady=5)
+        ttk.Button(frame, text='Quitter', command=root.destroy, width=20).pack(pady=5)
         frame.pack(expand=YES)
 
-        text_noms = Label(root, text="Arnaud Peralta, Yohann Goffart, Louis Pariente - Q1 2020",
+        Label(root, text="Arnaud Peralta, Yohann Goffart, Louis Pariente - Q1 2020",
                           font="Helvetica").pack(side=BOTTOM)
 
     def training_draw(self):
@@ -53,6 +56,11 @@ class App(ttk.Frame):
     def quit_app(self):
         self.master.quit
 
+    def chart(self):
+        self.clear_frame()
+        chart = Chart(self)
+        chart.build()
+
     def options_draw(self):
         self.clear_frame()
         options = Options(self.master, self)
@@ -63,5 +71,5 @@ class App(ttk.Frame):
             widget.pack_forget()
 
     def training_send(self, array):
-        print("fonction appellé par le training")
+        print("fonction appellée par le training")
 
