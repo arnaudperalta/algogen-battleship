@@ -2,6 +2,7 @@ from node import Node
 from random import randint
 import options as o
 import node as nd
+from math import floor
 
 
 class Individu:
@@ -20,7 +21,7 @@ class Individu:
         self.shoot_nb = 0
 
     def play(self, game):
-        ++self.shoot_nb
+        self.shoot_nb = self.shoot_nb + 1
         if self.notify_drown or (self.current_node is not None and self.current_node.depth == nd.MAX_TREE_DEPTH):
             self.notify = False
             self.notify_drown = False
@@ -28,34 +29,29 @@ class Individu:
             self.current_node = self.decision_tree
         else:
             if self.notify or self.inside_tree:
-                print("wtf j'ai touché")
                 if self.inside_tree:
                     if self.notify:
                         self.current_node = self.current_node.go_child_hit()
                         (x, y) = self.calc_coord()
                         self.last_coord = (x, y)
                         self.notify = False
-                        print(self.last_coord)
                         return [x, y]
                     else:
                         self.current_node = self.current_node.go_child_miss()
                         (x, y) = self.calc_coord()
                         self.last_coord = (x, y)
-                        print(self.last_coord)
                         return [x, y]
                 else:
                     self.current_node = self.decision_tree
                     self.inside_tree = True
                     (x, y) = self.calc_coord()
                     self.last_coord = (x, y)
-                    print(self.last_coord)
                     self.notify = False
                     return [x, y]
         choices = game.get_free_cells("left")
         res = choices[randint(0, len(choices) - 1)]
         x = res[0]
         y = res[1]
-        print(x, y)
         self.last_coord = (x, y)
         return [x, y]
 
@@ -96,7 +92,7 @@ class Individu:
                 aux_merge(nt.child_miss, t1.child_miss, t2.child_miss, depth + 1)
         tree1 = idv1.decision_tree
         tree2 = idv2.decision_tree
-        new_idv = Individu()
+        new_idv = Individu(idv1.population)
         new_tree = new_idv.decision_tree
         r = randint(0, 1)
         if r == 1:
@@ -130,7 +126,7 @@ class Population:
 
     def mutate(self):
         bool_tab = [0] * len(self.idv_tab)
-        n = (o.options_mutation_chance / 100) * len(self.idv_tab)
+        n = floor((o.options_mutation_chance / 100) * len(self.idv_tab))
         for i in range(n):
             r = randint(0, len(self.idv_tab) - 1)
             while bool_tab[r] == 1 :

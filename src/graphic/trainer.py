@@ -1,5 +1,6 @@
 from tkinter import *
 from tkinter import ttk
+import options as o
 from algogen_core import Core
 
 # Classe héritant de la classe Frame de tkinter
@@ -13,10 +14,11 @@ class Trainer(ttk.Frame):
         self.model = model
         self.base_app = base_app
         root = base_app.master
-
-        self.results = Text(self.master, width=100, height=30)
-        self.fulltrain_button = ttk.Button(root, text="Entrainement complet")
-        self.steptrain_button = ttk.Button(root, text="Entrainement pas à pas")
+        self.results = Text(self.master, width=100, height=28, bg="black")
+        self.results.tag_configure(tagName="Good", foreground="green")
+        self.results.tag_configure(tagName="Normal", foreground="white")
+        self.fulltrain_button = ttk.Button(root, text="Entrainement complet", command=self.fulltrain)
+        self.steptrain_button = ttk.Button(root, text="Entrainement pas à pas", command=self.steptrain)
         self.back_button = ttk.Button(root, text="Retour", command=self.back)
 
     def draw(self):
@@ -34,10 +36,23 @@ class Trainer(ttk.Frame):
             widget.destroy()
 
     def fulltrain(self):
-        while self.model.train():
-            print(self.model.pop_info())
+        n = self.model.pop.generation
+        for i in range(n, o.options_nbr_gen):
+            self.printgen(self.model.train())
+            self.update()
 
     def steptrain(self):
-        if self.model.train():
-            print(self.model.pop_info())
+        if self.model.pop.generation < o.options_nbr_gen:
+            self.printgen(self.model.train())
+            self.update()
 
+    def printgen(self, tab):
+        self.results.insert(END, "Génération " + str(self.model.pop.generation) + " : ", "Normal")
+        for i in tab:
+            if i[1] > 10:
+                self.results.insert(END, str(i[1]) + " | ", "Normal")
+            else:
+                self.results.insert(END, str(i[1]), "Good")
+                self.results.insert(END, " | ", "Normal")
+        self.results.insert(END, "\n")
+        self.results.see(END)

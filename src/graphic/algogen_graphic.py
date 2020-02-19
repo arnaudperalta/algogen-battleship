@@ -45,7 +45,7 @@ class App(ttk.Frame):
 
     def training_draw(self):
         self.clear_frame()
-        trainer = Trainer(self, None)
+        trainer = Trainer(self, self.model)
         trainer.draw()
 
     def play_vs_ia(self):
@@ -58,7 +58,7 @@ class App(ttk.Frame):
 
     def chart(self):
         self.clear_frame()
-        chart = Chart(self)
+        chart = Chart(self, self.model)
         chart.build()
 
     def options_draw(self):

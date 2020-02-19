@@ -2,6 +2,7 @@ from genetic import Population
 from genetic import Individu
 from random import randint
 import options as o
+from math import floor
 
 # Etats des cellules
 EMPTY_CELL = 0
@@ -44,8 +45,8 @@ class Core:
                 ended = self.play(game, "left")
             fit_tab.append((i, self.bot.fitness()))
             fit_sum += self.bot.fitness()
-        self.pop.sort(key=self.sortSecond)
-        saved = (o.options_saved_percentage / 100) * o.options_nbr_idv
+        fit_tab.sort(key=self.sortSecond)
+        saved = floor((o.options_saved_percentage / 100) * o.options_nbr_idv)
         new_idv_tab = []
         for i in range(saved):
             (x, y) = fit_tab[i]
@@ -56,9 +57,10 @@ class Core:
             new_idv_tab.append(Individu.merge(idv1, idv2))
         self.pop.idv_tab = new_idv_tab
         self.pop.mutate()
-        self.pop.gen_fit_score.append(fit_sum)
-        ++self.pop.generation
-        return 0
+        self.pop.gen_fit_score.append(fit_sum/(len(self.pop.idv_tab)))
+        self.pop.generation = self.pop.generation + 1
+        print(self.pop.generation)
+        return fit_tab
 
     # Return true si la partie est gagnée
     def play(self, game, to_attack="left"):
@@ -143,7 +145,6 @@ class Game:
                 for j in range(len(board)):
                     if isinstance(board[i][j], Boat) and board[i][j].state == BOAT_CELL:
                         return DROWN_ACTION
-            print("toto")
             return WIN_ACTION
         else:
             return HIT_ACTION
