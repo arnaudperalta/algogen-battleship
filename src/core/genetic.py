@@ -112,7 +112,8 @@ class Population:
         self.generation = 0
         # Le tableau ou seront stocké les Individus
         self.idv_tab = []
-        self.fit_tab = []
+
+        self.gen_fit_score = []
         for i in range(size):
             self.idv_tab.append(Individu(self))
 
