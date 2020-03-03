@@ -5,6 +5,14 @@ import options as o
 
 
 def main():
+    """
+    Fonction main du programme
+    On initialise ici :
+        - la configuration du programme
+        - une instance de la classe Core
+        - une instance de la classe App
+        - la construction de l'interface graphique
+    """
     # Enregistrement des options en mémoire
     o.init_option()
     # Instanciation du modèle
