@@ -15,6 +15,65 @@ FONT_BORDER = 7
 
 # Classe héritant de la classe Frame de tkinter
 class Board(ttk.Frame):
+    """
+    Classe héritant de la classe Frame TKinter utilisé pour la création
+    du plateau de jeu contre une intelligence artificielle.
+
+    Attributs
+    ---------
+    self : base_app
+       référence vers le singleton App : la fenêtre principale
+    cells_by_line
+        nombre de cellules par ligne, il est égal au nombre de cellules
+        par colonnes
+    game
+        référence vers une instance de la classe Game, elle correspond
+        au modèle d'une partie de bataille navale
+    base_app
+        référence vers le singleton App
+
+    Methodes
+    --------
+    draw()
+        affiche le menu de jeu
+    draw_grid(canvas, name)
+        construit une grille dans le canvas indiqué en parametre, on
+        indique le nom du canvas pour paramètrer les appels callback
+    boardleft_callback(event)
+        fonction callback du canvas du joueur de gauche, elle interprete
+        le click émis puis envoie au modèle Game l'action a effectué
+    boardright_callback(event)
+        fonction callback du canvas du joueur de droite, elle interprete
+        le click émis puis envoie au modèle Game l'action a effectué
+    back()
+        supprime les items de la fenêtre puis appel la fonction
+        d'affichage du menu principal
+    clear()
+        nettoie les items présentes dans la fenêtre
+    ready_clicked()
+        évenement déclenché grâce au bouton Prêt, on commence dans la
+        partie quand ce bouton est cliquer
+    render_board(canvas, board, ennemy)
+        affiche le rendu d'un board, cette fonction est appelé après
+        une action effectué dans le modèle. On assigne le canvas sur
+        lequel dessiner puis le contenu du board est donné via un
+        tableau à deux dimensions nommé board, on ajoute à ça un
+        booléen ennemy qui indique si le board est un board ennemi,
+        ce qui implique que l'on doit cacher certaines informations
+    paint_cell(canvas, coords, color)
+        dessine un rectangle de couleur 'color' a la coordonée 'coords'
+        dans le canvas entré en paramètre
+    cell_coords(x, y)
+        fonction outils qui transforme des coordonnées brut de canvas
+        en coordonée grille (ex : 3,4;4,6 -> 3;5)
+    draw_grid_coords(canvas)
+        affiche les coordonnées sur les deux grilles
+    game_won(winner)
+        déclare un joueur du nom de 'winner' gagnant de la partie, la
+        partie s'arrête
+    ask_ia()
+        récupère le prochain coup jouer par l'IA désigné par le modèle
+    """
     def __init__(self, base_app):
         super().__init__(base_app.master)
         self.cells_by_line = o.options_grid_size
@@ -23,26 +82,88 @@ class Board(ttk.Frame):
         root = base_app.master
 
         # Attributs graphiques et placements
-        self.button_back = ttk.Button(root, text="Retour", command=self.back)
-        self.board_left_name = Label(root, text="Ma grille", font=("Helvetica", 16))
-        self.board_right_name = Label(root, text="Grille adverse", font=("Helvetica", 16))
-        self.board_left = Canvas(root, width=BOARD_SIZE + 2 * BORDER_SIZE, height=BOARD_SIZE + 2 * BORDER_SIZE)
-        self.board_right = Canvas(root, width=BOARD_SIZE + 2 * BORDER_SIZE, height=BOARD_SIZE + 2 * BORDER_SIZE)
-        self.red_label = Label(root, text="Case rouge : Bateau touché", fg="red")
-        self.brown_label = Label(root, text="Case marron : Bateau coulé", fg="brown")
-        self.yellow_label = Label(root, text="Case bleue : Tir manqué", fg="blue")
-        self.grey_label = Label(root, text="Case grise : Pièce de bateau")
-        self.button_ready = ttk.Button(root, text="Prêt", command=self.ready_clicked)
-        self.phase_label = Label(root, text="Phase de jeu : Placez vos bateaux.")
-        self.boat_size_name = Label(root, text="Taille bateau")
+        self.button_back = ttk.Button(
+            root,
+            text="Retour",
+            command=self.back
+        )
+        self.board_left_name = Label(
+            root,
+            text="Ma grille",
+            font=("Helvetica", 16)
+        )
+        self.board_right_name = Label(
+            root,
+            text="Grille adverse",
+            font=("Helvetica", 16)
+        )
+        self.board_left = Canvas(
+            root,
+            width=BOARD_SIZE + 2 * BORDER_SIZE,
+            height=BOARD_SIZE + 2 * BORDER_SIZE
+        )
+        self.board_right = Canvas(
+            root,
+            width=BOARD_SIZE + 2 * BORDER_SIZE,
+            height=BOARD_SIZE + 2 * BORDER_SIZE
+        )
+        self.red_label = Label(
+            root,
+            text="Case rouge : Bateau touché",
+            fg="red"
+        )
+        self.brown_label = Label(
+            root,
+            text="Case marron : Bateau coulé",
+            fg="brown"
+        )
+        self.yellow_label = Label(
+            root,
+            text="Case bleue : Tir manqué",
+            fg="blue"
+        )
+        self.grey_label = Label(
+            root,
+            text="Case grise : Pièce de bateau"
+        )
+        self.button_ready = ttk.Button(
+            root,
+            text="Prêt",
+            command=self.ready_clicked
+        )
+        self.phase_label = Label(
+            root,
+            text="Phase de jeu : Placez vos bateaux."
+        )
+        self.boat_size_name = Label(
+            root,
+            text="Taille bateau"
+        )
         self.boat_size = IntVar()
         self.boat_size.set(3)
-        self.boat_size_entry = Entry(root, textvariable=self.boat_size, width=1)
-        self.orientation_name = Label(root, text="Orientation")
+        self.boat_size_entry = Entry(
+            root,
+            textvariable=self.boat_size,
+            width=1
+        )
+        self.orientation_name = Label(
+            root,
+            text="Orientation"
+        )
         self.orientation = StringVar()
-        self.orientation_choices = {"Nord", "Nord", "Ouest", "Est", "Sud"}
+        self.orientation_choices = {
+            "Nord",
+            "Nord",
+            "Ouest",
+            "Est",
+            "Sud"
+        }
         self.orientation.set("Nord")
-        self.orientation_menu = ttk.OptionMenu(root, self.orientation, *self.orientation_choices)
+        self.orientation_menu = ttk.OptionMenu(
+            root,
+            self.orientation,
+            *self.orientation_choices
+        )
 
     # Place les éléments graphiques dans la fenêtre
     def draw(self):
@@ -65,17 +186,29 @@ class Board(ttk.Frame):
         self.draw_grid(self.board_left, "left")
         self.draw_grid(self.board_right, "right")
 
-    # Dessine une grille sur le canvas donné
     def draw_grid(self, canvas, name):
-        canvas.create_rectangle(BORDER_SIZE, BORDER_SIZE, BOARD_SIZE + BORDER_SIZE, BOARD_SIZE + BORDER_SIZE)
+        canvas.create_rectangle(
+            BORDER_SIZE,
+            BORDER_SIZE,
+            BOARD_SIZE + BORDER_SIZE,
+            BOARD_SIZE + BORDER_SIZE
+        )
         cell_size = BOARD_SIZE / self.cells_by_line
         # Tracé des lignes
         for i in range(1, self.cells_by_line):
-            canvas.create_line(i * cell_size + BORDER_SIZE, BORDER_SIZE
-                               , i * cell_size + BORDER_SIZE, BORDER_SIZE + BOARD_SIZE)
+            canvas.create_line(
+                i * cell_size + BORDER_SIZE,
+                BORDER_SIZE,
+                i * cell_size + BORDER_SIZE,
+                BORDER_SIZE + BOARD_SIZE
+            )
         for i in range(1, self.cells_by_line):
-            canvas.create_line(BORDER_SIZE, i * cell_size + BORDER_SIZE
-                               , BORDER_SIZE + BOARD_SIZE, i * cell_size + BORDER_SIZE)
+            canvas.create_line(
+                BORDER_SIZE,
+                i * cell_size + BORDER_SIZE,
+                BORDER_SIZE + BOARD_SIZE,
+                i * cell_size + BORDER_SIZE
+            )
         # Mapping des cellules
         if name == "left":
             canvas.bind("<Button-1>", self.boardleft_callback)
@@ -83,40 +216,53 @@ class Board(ttk.Frame):
             canvas.bind("<Button-1>", self.boardright_callback)
         self.draw_grid_coords(canvas)
 
-    # Fonction callback appellé sur un click du canvas gauche
     def boardleft_callback(self, event):
         if self.game.game_state == core.BOATS_PLACEMENT:
-            res = self.game.place_boat("left", self.cell_coords(event.x, event.y), self.boat_size.get()
-                                       , self.orientation.get())
+            res = self.game.place_boat(
+                "left",
+                self.cell_coords(event.x, event.y),
+                self.boat_size.get(),
+                self.orientation.get()
+            )
             if res is not False:
-                self.render_board(self.board_left, self.game.get_display_board("left"))
+                self.render_board(
+                    self.board_left,
+                    self.game.get_display_board("left")
+                )
 
-    # Fonction callback appellé sur un click du canvas droite
     def boardright_callback(self, event):
         if self.game.game_state == core.ATTACK:
-            res = self.game.attack("right", self.cell_coords(event.x, event.y))
+            res = self.game.attack(
+                "right",
+                self.cell_coords(event.x, event.y)
+            )
             self.game.get_display_board("right")
-            self.render_board(self.board_right, self.game.get_display_board("right"), ennemy=True)
+            self.render_board(
+                self.board_right,
+                self.game.get_display_board("right"),
+                ennemy=True
+            )
             if res == core.NO_ACTION:
-                # Case déja clické avant
+                # Case déja cliqué avant
                 return
             if res == core.WIN_ACTION:
                 self.game_won("gauche")
             else:
                 self.ask_ia()
-                self.render_board(self.board_left, self.game.get_display_board("left"), ennemy=False)
+                self.render_board(
+                    self.board_left,
+                    self.game.get_display_board("left"),
+                    ennemy=False
+                )
 
-    # Retourne dans le menu
     def back(self):
         self.clear()
         self.base_app.home_draw()
 
-    # Nettoie la fenêtre des éléments graphiques
     def clear(self):
         for widget in self.base_app.master.winfo_children():
             widget.destroy()
 
-    # Fonction executé lorsque le joueurr est prêt à jouer et a cliqué sur le bouton ready
     def ready_clicked(self):
         if self.game.game_begin():
             self.button_ready.destroy()
@@ -124,9 +270,10 @@ class Board(ttk.Frame):
             self.orientation_menu.destroy()
             self.boat_size_name.destroy()
             self.boat_size_entry.destroy()
-            self.phase_label.configure(text="Phase de jeu : Tirez sur la grille ennemi.")
+            self.phase_label.configure(
+                text="Phase de jeu : Tirez sur la grille ennemi."
+            )
 
-    # Ré-affiche completement un board en mettant a jour toute les cellules
     def render_board(self, canvas, board, ennemy=False):
         for i in range(len(board)):
             for j in range(len(board)):
@@ -145,48 +292,63 @@ class Board(ttk.Frame):
                     color = "blue"
                 self.paint_cell(canvas, [i, j], color)
 
-    # Colorie une cellule d'un board donné à une coordonné donnée
     def paint_cell(self, canvas, coords, color):
         if min(coords) < 0 or max(coords) > self.cells_by_line - 1:
             return
         cell_size = BOARD_SIZE / self.cells_by_line
-        canvas.create_rectangle(BORDER_SIZE + (coords[0]) * cell_size
-                                , BORDER_SIZE + (coords[1]) * cell_size
-                                , BORDER_SIZE + (coords[0] + 1) * cell_size
-                                , BORDER_SIZE + (coords[1] + 1) * cell_size
-                                , fill=color)
+        canvas.create_rectangle(
+            BORDER_SIZE + (coords[0]) * cell_size,
+            BORDER_SIZE + (coords[1]) * cell_size,
+            BORDER_SIZE + (coords[0] + 1) * cell_size,
+            BORDER_SIZE + (coords[1] + 1) * cell_size,
+            fill=color
+        )
         self.draw_grid_coords(canvas)
 
-    # Transforme des coordonnées canvas en couple x,y de coords cellules
     def cell_coords(self, x, y):
-        return [math.floor((x - BORDER_SIZE) * self.cells_by_line / BOARD_SIZE),
-                math.floor((y - BORDER_SIZE) * self.cells_by_line / BOARD_SIZE)]
+        return [math.floor((x - BORDER_SIZE) * self.cells_by_line
+                           / BOARD_SIZE),
+                math.floor((y - BORDER_SIZE) * self.cells_by_line
+                           / BOARD_SIZE)
+                ]
 
-    # Affiche les coorfonnées graphiques sur le canvas donné
     def draw_grid_coords(self, canvas):
         cell_size = BOARD_SIZE / self.cells_by_line
         x_coord = "A"
         y_coord = "0"
         canvas.delete("coord")
-        canvas.create_text(BORDER_SIZE + FONT_BORDER * 2, BORDER_SIZE + FONT_BORDER, font=("Helvetica", 12)
-                           , text=x_coord + " / " + y_coord, tags="coord")
+        canvas.create_text(
+            BORDER_SIZE + FONT_BORDER * 2,
+            BORDER_SIZE + FONT_BORDER,
+            font=("Helvetica", 12),
+            text=x_coord + " / " + y_coord,
+            tags="coord"
+        )
         # Tracé des lignes
         for i in range(1, self.cells_by_line):
             x_coord = chr(ord(x_coord) + 1)
-            canvas.create_text(i * cell_size + BORDER_SIZE + FONT_BORDER, BORDER_SIZE + FONT_BORDER
-                               , font=("Helvetica", 12), text=x_coord, tags="coord")
+            canvas.create_text(
+                i * cell_size + BORDER_SIZE + FONT_BORDER,
+                BORDER_SIZE + FONT_BORDER,
+                font=("Helvetica", 12),
+                text=x_coord,
+                tags="coord"
+            )
         for i in range(1, self.cells_by_line):
             y_coord = chr(ord(y_coord) + 1)
-            canvas.create_text(BORDER_SIZE + FONT_BORDER, i * cell_size + BORDER_SIZE + FONT_BORDER
-                               , font=("Helvetica", 12), text=y_coord, tags="coord")
+            canvas.create_text(
+                BORDER_SIZE + FONT_BORDER,
+                i * cell_size + BORDER_SIZE + FONT_BORDER,
+                font=("Helvetica", 12),
+                text=y_coord,
+                tags="coord"
+            )
 
-    # Signal une victoire d'un joueur
     def game_won(self, winner):
         self.board_left.unbind("<Button 1>")
         self.board_right.unbind("<Button 1>")
         self.phase_label.configure(text="Winner : joueur " + winner)
 
-    # Notifie l'IA qu'il doit jouer
     def ask_ia(self):
         if self.base_app.get_model().play(self.game):
             self.game_won("right")

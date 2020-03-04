@@ -148,10 +148,15 @@ class Options(ttk.Frame):
         options_nbr_idv = self.nbr_idv.get()
         options_grid_size = self.grid_size.get()
         options_ship_number = self.ship_number.get()
-        data = {"nbr_gen": options_nbr_gen, "saved_%": options_saved_percentage,
-                "mut_%": options_mutation_chance, "def_gen": options_def_gen,
-                "nbr_idv": options_nbr_idv,
-                "grid_size": options_grid_size, "ship_nbr": options_ship_number}
+        data = {
+            "nbr_gen": options_nbr_gen,
+            "saved_%": options_saved_percentage,
+            "mut_%": options_mutation_chance,
+            "def_gen": options_def_gen,
+            "nbr_idv": options_nbr_idv,
+            "grid_size": options_grid_size,
+            "ship_nbr": options_ship_number
+        }
         with open('../cfg/option.json', 'w') as file:
             json.dump(data, file)
         file.close()

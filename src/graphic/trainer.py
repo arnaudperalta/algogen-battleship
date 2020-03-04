@@ -5,21 +5,69 @@ from algogen_core import Core
 
 # Classe héritant de la classe Frame de tkinter
 
-# TODO quand on quitte le trainer il faut nettoyer tout le model car les options peuvent se faire modifier
+# TODO quand on quitte le trainer il faut nettoyer tout le model car
+#  les options peuvent se faire modifier
 
 
 class Trainer(ttk.Frame):
+    """
+    Classe héritant de la classe Frame de TKinter qui affichera les
+    résultats de l'entrainement des individus concernant l'algorithme
+    génétique
+
+    Attributs
+    ---------
+    model : model
+        référence vers une instance de Core
+    base_app : base_app
+        référence vers le singleton App
+
+    Methodes
+    --------
+    draw()
+        construit dans la fenêtre l'espace où les résultats de
+        l'algorithme génétique seront stockés
+    back()
+        effectue un retour au menu principal
+    clear()
+        nettoie la fenêtre de tout les items dessinés avant
+    fulltrain()
+        appel via la classe Core l'exécution d'un entrainement complet
+    steptrain()
+        appel via la classe Core l'éxecution d'un entrainement pas
+        par pas
+    printgen()
+        affiche les résultats de l'évaluation de la dernière génération
+        calculée
+    """
     def __init__(self, base_app, model):
         super().__init__(base_app.master)
         self.model = model
         self.base_app = base_app
         root = base_app.master
-        self.results = Text(self.master, width=100, height=28, bg="black")
+        self.results = Text(
+            self.master,
+            width=100,
+            height=28,
+            bg="black"
+        )
         self.results.tag_configure(tagName="Good", foreground="green")
         self.results.tag_configure(tagName="Normal", foreground="white")
-        self.fulltrain_button = ttk.Button(root, text="Entrainement complet", command=self.fulltrain)
-        self.steptrain_button = ttk.Button(root, text="Entrainement pas à pas", command=self.steptrain)
-        self.back_button = ttk.Button(root, text="Retour", command=self.back)
+        self.fulltrain_button = ttk.Button(
+            root,
+            text="Entrainement complet",
+            command=self.fulltrain
+        )
+        self.steptrain_button = ttk.Button(
+            root,
+            text="Entrainement pas à pas",
+            command=self.steptrain
+        )
+        self.back_button = ttk.Button(
+            root,
+            text="Retour",
+            command=self.back
+        )
 
     def draw(self):
         self.results.pack(side=TOP)
@@ -47,7 +95,11 @@ class Trainer(ttk.Frame):
             self.update()
 
     def printgen(self, tab):
-        self.results.insert(END, "Génération " + str(self.model.pop.generation) + " : ", "Normal")
+        self.results.insert(
+            END,
+            "Génération " + str(self.model.pop.generation) + " : ",
+            "Normal"
+        )
         for i in tab:
             if i[1] > 10:
                 self.results.insert(END, str(i[1]) + " | ", "Normal")

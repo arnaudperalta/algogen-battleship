@@ -24,6 +24,31 @@ PLAYER_RIGHT_WIN = 3
 
 
 class Core:
+    """
+    Classe utilisé pour l'éxecution de l'algorithme génétique
+
+    Attributs
+    ---------
+    pop
+        Instance de la classe Population
+    bot
+        Individu désigné pour être l'IA qui jouera dans la section
+        du programme Player vs IA
+
+    Methodes
+    --------
+    train()
+        Procède a l'éxecution de l'algorithme génétique sur la
+        génération actuelle sur une génération. On y fait jouer une
+        partie de bataille navale pour chaque pour chaque individu,
+        on conserve les individus qui ont gagné la partie en un
+        minimum de coup, on produit de nouveaux individus à partir des
+        meilleurs (cross-over génétique) puis on mute toute la
+        population.
+    play()
+        Simule une action joueur humain dans une partie, qui est une
+        instance de Game.
+    """
     def __init__(self):
         # Lecture des paramètres
         self.pop = Population(o.options_nbr_idv)
@@ -45,8 +70,9 @@ class Core:
                 ended = self.play(game, "left")
             fit_tab.append((i, self.bot.fitness()))
             fit_sum += self.bot.fitness()
-        fit_tab.sort(key=self.sortSecond)
-        saved = floor((o.options_saved_percentage / 100) * o.options_nbr_idv)
+        fit_tab.sort(key=self.sort_second)
+        saved = floor((o.options_saved_percentage / 100)
+                      * o.options_nbr_idv)
         new_idv_tab = []
         for i in range(saved):
             (x, y) = fit_tab[i]
@@ -77,19 +103,60 @@ class Core:
         else:
             return self.play(game, to_attack)
 
-    def sortSecond(self, val):
-        return val[1]
+
+def sort_second(val):
+    return val[1]
 
 
-    # Classe simulant une partie de bataille navale
 class Game:
+    """
+    Classe utilisé pour l'éxecution de l'algorithme génétique
+
+    Attributs
+    ---------
+    game_state
+        Etat actuel de la partie:
+            - phase de placement
+            - phase d'attaque
+            - partie remportée
+    board1, board2
+        Tableau a deux dimensions représentant une grille de jeu de
+        bataille navale
+
+    Methodes
+    --------
+    place_boat(board_name, coords, boat_size, orientation)
+        place un bateau sur le board donné en paramètre, renvoie true
+        si la place pour placer le bateau comme voulu a été suffisante
+    attack(board_name, coords)
+        simule une attaque sur le board donné en paramètre
+        renvoie une action correspondante :
+            - MISS_ACTION
+            - DROWN_ACTION
+            - WIN_ACTION
+            - HIT_ACTION
+    get_display_board(board)
+        transforme un board du modèle Game en un board adapté à
+        l'affichage et destiné au module graphic, ce board contient que
+        des entiers de valeurs :
+            - EMPTY_CELL
+            - BOAT_CELL
+            - HIT_CELL
+            - DROWN_CELL
+            - MISS_CELL
+    game_begin()
+        vérifie si un bateau est placé dans chaque grille puis démarre
+        une partie de bataille navale
+    game_reset()
+        réinitialise l'instance de Game courante en ré-appelant le
+        constructeur
+    // TODO
+    """
     def __init__(self):
         self.game_state = BOATS_PLACEMENT
         self.board1 = create_board(o.options_grid_size)
         self.board2 = create_board(o.options_grid_size)
 
-    # Place le bateau en crééant plusieurs fois une instance de boat sur un board, renvoie true si
-    # le bateau a bien été placé
     def place_boat(self, board_name, coords, boat_size, orientation):
         if boat_size < 1:
             return False
@@ -102,12 +169,14 @@ class Game:
         boat_coords = []
         if orientation == "Nord":
             for i in range(boat_size):
-                if board[coords[0]][coords[1] - i] is not None or coords[1] - i < 0:
+                if board[coords[0]][coords[1] - i] is not None \
+                        or coords[1] - i < 0:
                     return False
                 boat_coords.append([coords[0], coords[1] - i])
         elif orientation == "Ouest":
             for i in range(boat_size):
-                if board[coords[0] - i][coords[1]] is not None or coords[0] - i < 0:
+                if board[coords[0] - i][coords[1]] is not None \
+                        or coords[0] - i < 0:
                     return False
                 boat_coords.append([coords[0] - i, coords[1]])
         elif orientation == "Est":
@@ -124,11 +193,10 @@ class Game:
         board[boat_coords[0][0]][boat_coords[0][1]] = main_boat
         childs = main_boat.get_childs()
         for i in range(len(childs)):
-            board[boat_coords[i + 1][0]][boat_coords[i + 1][1]] = childs[i]
+            board[boat_coords[i + 1][0]][boat_coords[i + 1][1]] \
+                = childs[i]
         return True
 
-    # Tir un boulet sur un board donné a des coordonnées données
-    # Renvoie l'action approprié
     def attack(self, board_name, coords):
         if board_name == "left":
             board = self.board1
@@ -143,14 +211,13 @@ class Game:
         if target.hit():
             for i in range(len(board)):
                 for j in range(len(board)):
-                    if isinstance(board[i][j], Boat) and board[i][j].state == BOAT_CELL:
+                    if isinstance(board[i][j], Boat) \
+                            and board[i][j].state == BOAT_CELL:
                         return DROWN_ACTION
             return WIN_ACTION
         else:
             return HIT_ACTION
 
-    # Renvoie un plateau avec des valeurs prêtes pour le module d'affichage
-    # C'est à dire qu'il est libre de toute référence, seulement constitué d'entier
     def get_display_board(self, name):
         result = []
         if name == "left":
@@ -169,7 +236,6 @@ class Game:
             result.append(line)
         return result
 
-    # Verifie si un bateau est placé pour chaque joueur et renvoie true si la partie commence
     def game_begin(self):
         boat = False
         # Vérification du board 1
@@ -196,7 +262,6 @@ class Game:
         self.game_state = ATTACK
         return True
 
-    # Recommence une partie en faisant une ré-éxecution du constructeur
     def game_reset(self):
         self.__init__()
 
@@ -209,7 +274,8 @@ class Game:
             board = self.board2
         for i in range(len(board)):
             for j in range(len(board)):
-                if board[i][j] is None or isinstance(board[i][j], Boat) and board[i][j].state == BOAT_CELL:
+                if board[i][j] is None or isinstance(board[i][j], Boat)\
+                        and board[i][j].state == BOAT_CELL:
                     cells.append([i, j])
         return cells
 
@@ -260,7 +326,8 @@ class Boat:
                 set_all_drowned(self)
                 return True
         else:
-            if self.parent.get_state() == HIT_CELL and is_all_hits(self.parent.child):
+            if self.parent.get_state() == HIT_CELL \
+                    and is_all_hits(self.parent.child):
                 set_all_drowned(self.parent)
                 return True
         return False
