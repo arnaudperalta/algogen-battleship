@@ -101,6 +101,7 @@ class Core:
                 return True
             return False
         else:
+            self.bot.shoot_nb = self.bot.shoot_nb - 1
             return self.play(game, to_attack)
 
 
