@@ -2,6 +2,7 @@ from genetic import Population
 from genetic import Individu
 from random import randint
 import options as o
+import genetic as g
 from math import floor
 
 # Etats des cellules
@@ -70,7 +71,7 @@ class Core:
                 ended = self.play(game, "left")
             fit_tab.append((i, self.bot.fitness()))
             fit_sum += self.bot.fitness()
-        fit_tab.sort(key=self.sort_second)
+        fit_tab.sort(key=sort_second)
         saved = floor((o.options_saved_percentage / 100)
                       * o.options_nbr_idv)
         new_idv_tab = []
@@ -80,12 +81,11 @@ class Core:
         for i in range(o.options_nbr_idv - saved):
             idv1 = new_idv_tab[randint(0, saved - 1)]
             idv2 = new_idv_tab[randint(0, saved - 1)]
-            new_idv_tab.append(Individu.merge(idv1, idv2))
+            new_idv_tab.append(g.merge(idv1, idv2))
         self.pop.idv_tab = new_idv_tab
         self.pop.mutate()
         self.pop.gen_fit_score.append(fit_sum/(len(self.pop.idv_tab)))
         self.pop.generation = self.pop.generation + 1
-        print(self.pop.generation)
         return fit_tab
 
     # Return true si la partie est gagnée
@@ -150,7 +150,8 @@ class Game:
     game_reset()
         réinitialise l'instance de Game courante en ré-appelant le
         constructeur
-    // TODO
+    get_free_cells(board_name)
+        retourne une liste de cases vide où l'IA pour
     """
     def __init__(self):
         self.game_state = BOATS_PLACEMENT
@@ -265,7 +266,6 @@ class Game:
     def game_reset(self):
         self.__init__()
 
-    # Permet d'obtenir une liste composée des coordonnées des cellules libres
     def get_free_cells(self, board_name):
         cells = []
         if "left" == board_name:
@@ -280,8 +280,49 @@ class Game:
         return cells
 
 
-# Classe qui a uné définition récursive, les enfants pointent vers le parent.
 class Boat:
+    """
+    Classe utilisé pour la simulation d'une case de bateau au sein d'une
+    grille de bataille navale, le constructeur possède une récusrvité
+    indirecte, un bateau sur une grille possède une instance de Boat
+    'mère' (là ou le joueur a cliquer) puis créé des instances 'fils' de
+    boat afin de construire le reste du bateau suivant la taille en
+    parametre du constructeur
+
+    Attributs
+    ---------
+    parent : parent
+        référence vers l'instance Boat mère, si on se situe dans une
+        instance fils
+    size : size
+        taille du bateau
+    child
+        liste des instances de Boat 'fils' qui ont comme parent 'self'
+    state
+        état de la case :
+            - BOAT_CELL
+            - HIT_CELL
+            - DROWN_CELL
+
+    Methodes
+    --------
+    ini_boat()
+        initialise toutes les instances 'fils' de cette instance
+    get_state()
+        retourne l'état de la case representé par cette instance
+    set_state()
+        modifie l'état de la case representé par cette instance
+    get_childs()
+        retourne la liste des 'fils de cette instance
+    hit()
+        attaque la case representé par cette instance, si cette case
+        n'était pas encore touchée, elle devient HIT_CELL, si tout ces
+        enfants sont touchée et que cette instance est mère, dans ce cas
+        on change tout les états des enfants et de cette instance en
+        DROWN_CELL. Pareil si cette instance et enfant et que la mère
+        et ces enfants ont un état HIT_CELL
+        retourne true si on a changé DROWN_CELL, sinon false
+    """
     def __init__(self, size, parent=None):
         self.parent = parent
         self.size = size
@@ -290,12 +331,10 @@ class Boat:
         if parent is None:
             self.ini_boat()
 
-    # Initialise le bateau parent
     def ini_boat(self):
         for i in range(self.size - 1):
             self.child.append(Boat(self.size, parent=self))
 
-    # Retourne l'état du bateau
     def get_state(self):
         return self.state
 
@@ -305,9 +344,6 @@ class Boat:
     def get_childs(self):
         return self.child
 
-    # Touche le bateau pour le le mettre dans un état touché puis verifie si sa famille
-    # n'est pas entierement touché pour tout coulé
-    # retourne true si coulé, sinon retourne false
     def hit(self):
         def is_all_hits(array):
             for i in range(len(array)):
@@ -335,6 +371,10 @@ class Boat:
 
 # Créer un board d'une taille size
 def create_board(size):
+    """
+    créer un board representé par un tableau a deux dimenions de taille
+    size
+    """
     board = []
     for i in range(0, size):
         line = []

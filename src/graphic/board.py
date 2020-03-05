@@ -78,6 +78,8 @@ class Board(ttk.Frame):
         super().__init__(base_app.master)
         self.cells_by_line = o.options_grid_size
         self.game = Game()
+        # On place un bateau sur la grille ennemi
+        self.game.place_boat("right", (0, 0), 3, "Sud")
         self.base_app = base_app
         root = base_app.master
 
@@ -322,8 +324,7 @@ class Board(ttk.Frame):
             BORDER_SIZE + FONT_BORDER,
             font=("Helvetica", 12),
             text=x_coord + " / " + y_coord,
-            tags="coord"
-        )
+            tags="coord")
         # Tracé des lignes
         for i in range(1, self.cells_by_line):
             x_coord = chr(ord(x_coord) + 1)
@@ -332,8 +333,7 @@ class Board(ttk.Frame):
                 BORDER_SIZE + FONT_BORDER,
                 font=("Helvetica", 12),
                 text=x_coord,
-                tags="coord"
-            )
+                tags="coord")
         for i in range(1, self.cells_by_line):
             y_coord = chr(ord(y_coord) + 1)
             canvas.create_text(
@@ -341,13 +341,16 @@ class Board(ttk.Frame):
                 i * cell_size + BORDER_SIZE + FONT_BORDER,
                 font=("Helvetica", 12),
                 text=y_coord,
-                tags="coord"
-            )
+                tags="coord")
 
     def game_won(self, winner):
         self.board_left.unbind("<Button 1>")
         self.board_right.unbind("<Button 1>")
-        self.phase_label.configure(text="Winner : joueur " + winner)
+        if winner == "right":
+            winner = "IA génétique"
+        else:
+            winner = "humain";
+        self.phase_label.configure(text="Gagnant : Joueur " + winner)
 
     def ask_ia(self):
         if self.base_app.get_model().play(self.game):
