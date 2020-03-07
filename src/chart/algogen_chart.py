@@ -41,12 +41,10 @@ class Chart(ttk.Frame):
         Axe Y : (avg_shot) Nombre moyen de tir necessaires
         """
         root = self.master
-        # TODO: Supprimer les 2 lignes suivantes et ajouter les tableaux
-        # en argument de la fonction
         if self.model.pop.generation > DEFAULT_POPULATION_GEN:
             self.grid()
-            nb_gen = [i for i in range(o.options_nbr_gen)]
             avg_shot = [i for i in self.model.pop.gen_fit_score]
+            nb_gen = [i for i in range(len(avg_shot))]
             figure = Figure(figsize=(8, 4), dpi=100)
             ax1 = figure.add_subplot(1, 1, 1)
             ax1.plot(nb_gen, avg_shot)
