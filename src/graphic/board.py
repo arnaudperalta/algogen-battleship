@@ -64,6 +64,8 @@ class Board(ttk.Frame):
 
         self.draw_grid(self.board_left, "left")
         self.draw_grid(self.board_right, "right")
+        self.game.place_random("right", o.options_ship_number, 3, 3)
+        self.render_board(self.board_left, self.game.get_display_board("left"), ennemy=False)
 
     # Dessine une grille sur le canvas donné
     def draw_grid(self, canvas, name):

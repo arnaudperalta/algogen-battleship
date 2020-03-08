@@ -1,6 +1,7 @@
 import json
 from tkinter import ttk
 from tkinter import IntVar
+from tkinter import DoubleVar
 
 options_nbr_gen = 0
 options_saved_percentage = 0
@@ -17,7 +18,7 @@ class Options(ttk.Frame):
         self.return_app = app
         self.nbr_gen = IntVar()
         self.saved_percentage = IntVar()
-        self.mutation_chance = IntVar()
+        self.mutation_chance = DoubleVar()
         self.def_gen = IntVar()
         self.nbr_idv = IntVar()
         self.grid_size = IntVar()

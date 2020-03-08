@@ -1,5 +1,5 @@
 from node import Node
-from random import randint
+import random as rd
 import options as o
 import node as nd
 from math import floor
@@ -49,7 +49,7 @@ class Individu:
                     self.notify = False
                     return [x, y]
         choices = game.get_free_cells("left")
-        res = choices[randint(0, len(choices) - 1)]
+        res = choices[rd.randint(0, len(choices) - 1)]
         x = res[0]
         y = res[1]
         self.last_coord = (x, y)
@@ -64,25 +64,20 @@ class Individu:
     def fitness(self):
         return self.shoot_nb
 
-    def mutate(self, i=0, node=None):
-        if i == 0:
-            node = self.decision_tree
-            i = randint(1, nd.MAX_TREE_DEPTH)
-        if node.depth == i:
-            node.offset = (randint(-o.options_grid_size, o.options_grid_size),
-                           randint(-o.options_grid_size, o.options_grid_size))
-            return
-        else:
-            r = randint(0, 1)
-            if r == 0:
-                self.mutate(i, node.go_child_hit())
-            else:
-                self.mutate(i, node.go_child_miss())
+    def mutate(self, node=None):
+        r = rd.random()
+        if r * 100 <= o.options_mutation_chance:
+            node.offset = (rd.randint(-o.options_grid_size, o.options_grid_size),
+                           rd.randint(-o.options_grid_size, o.options_grid_size))
+            print("mutation :" + str(r) + " " + str(o.options_mutation_chance) )
+        if node.depth < nd.MAX_TREE_DEPTH:
+            self.mutate(node.go_child_hit())
+            self.mutate(node.go_child_miss())
 
     @staticmethod
     def merge(idv1, idv2):
         def aux_merge(nt, t1, t2, depth):
-            r = randint(0, 1)
+            r = rd.randint(0, 1)
             if r == 1:
                 nt.offset = t1.offset
             else:
@@ -94,7 +89,7 @@ class Individu:
         tree2 = idv2.decision_tree
         new_idv = Individu(idv1.population)
         new_tree = new_idv.decision_tree
-        r = randint(0, 1)
+        r = rd.randint(0, 1)
         if r == 1:
             new_tree.offset = tree1.offset
         else:
@@ -126,12 +121,6 @@ class Population:
         self.idv_tab.pop(index)
 
     def mutate(self):
-        bool_tab = [0] * len(self.idv_tab)
-        n = floor((o.options_mutation_chance / 100) * len(self.idv_tab))
-        for i in range(n):
-            r = randint(0, len(self.idv_tab) - 1)
-            while bool_tab[r] == 1 :
-                r = randint(0, len(self.idv_tab) - 1)
-            self.idv_tab[r].mutate()
-            bool_tab[r] = 1
+        for idv in self.idv_tab:
+            idv.mutate(idv.decision_tree)
         return 0

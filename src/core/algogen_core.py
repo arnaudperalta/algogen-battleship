@@ -38,7 +38,8 @@ class Core:
             self.bot.shoot_nb = 0
             game = Game()
             game.place_boat("right", [0, 0], 3, "Sud")
-            game.place_boat("left", [0, 0], 3, "Sud")
+            #game.place_boat("left", [0, 0], 3, "Sud")
+            game.place_random("left", o.options_ship_number, 3, 3)
             game.game_begin()
             ended = False
             while not ended:
@@ -75,6 +76,7 @@ class Core:
                 return True
             return False
         else:
+            self.bot.shoot_nb = self.bot.shoot_nb - 1
             return self.play(game, to_attack)
 
     def sortSecond(self, val):
@@ -213,8 +215,27 @@ class Game:
                     cells.append([i, j])
         return cells
 
+    #Placement aléatoire de nb bateaux de taille situé entre sizemin et sizemax sur le board
+    # board_name
+    def place_random(self, board_name, nb, sizemin, sizemax):
+        if sizemax > o.options_grid_size  or sizemin < 1 :
+            return False
+        for i in range(nb):
+            placed = False
+            while not placed:
+                r = randint(0, 1)
+                bsize = randint(sizemin, sizemax)
+                if r == 1 :
+                    coordx = randint(0, o.options_grid_size - 1)
+                    coordy = randint(0, o.options_grid_size - bsize)
+                    placed = self.place_boat(board_name, [coordx, coordy], bsize, "Sud")
+                else:
+                    coordx = randint(0, o.options_grid_size - bsize)
+                    coordy = randint(0, o.options_grid_size - 1)
+                    placed = self.place_boat(board_name, [coordx, coordy], bsize, "Est")
+        return True
 
-# Classe qui a uné définition récursive, les enfants pointent vers le parent.
+                # Classe qui a uné définition récursive, les enfants pointent vers le parent.
 class Boat:
     def __init__(self, size, parent=None):
         self.parent = parent
