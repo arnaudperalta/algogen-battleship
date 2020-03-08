@@ -1,0 +1,139 @@
+\documentclass[12pt]{report}
+\usepackage[a4paper, total={6in, 10in}, top=30mm]{geometry}
+\usepackage{hyperref}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{setspace}
+\usepackage{graphicx}
+
+\pagestyle{fancy}
+\fancyhf{}
+\rhead{AlgoGen Jeux}
+
+\renewcommand{\thesection}{\arabic{section}} % Pour enlever les numéros de chapitre
+\begin{document}
+\begin{titlepage}
+    \centering
+    \hspace{0pt}
+    \vfill
+    {\LARGE Application Informatique\\AlgoGen Jeux\\}
+    \vspace{0.5cm}
+    {\LARGE Projet de Licence 3 Informatique}
+    \vspace{1cm}
+    {\large \\Arnaud Peralta, Yohann Goffart, Louis Pariente}
+    \vspace{0.05cm}
+    {\large \\Enseignant référent Carla Selmi\\}
+    \vspace{3cm}
+    {\large \href{https://github.com/arnaudperalta/algogen-battleship}{https://github.com/arnaudperalta/algogen-battleship}}
+    \vfill
+    \includegraphics[width=4cm]{uni.png}
+    \hspace{2 cm}
+    \includegraphics[width=4cm]{ufr.jpg}
+\end{titlepage}
+\renewcommand{\contentsname}{Sommaire}
+\doublespacing
+\tableofcontents
+\newpage
+\lhead{Introduction aux algorithmes génétiques}
+
+\section{Introduction aux algorithmes génétiques}
+	\subsection{Définitions}
+	\singlespacing
+	\underline{Algorithme génétique} : Algorithme ayant pour but d'obtenir une solution approchée
+	à un problème d'optimisation (ici un jeu) dans une situation où il n'existe pas de méthode
+	pour le résoudre. Ces algorithmes utilisent la notion de sélection naturelle et l'appliquent sur un ensemble d'individus différents (appelé population).\\Lorsqu'un individu semble correspondre à la situation dont il est confronté, on peut interpréter ses gènes comme un algorithme optimisé pour résoudre cette situation.\\\\
+	\underline{Sélection naturelle} : Mécanisme d'évolution d'une espèce qui traduit le succès
+	\\reproductif et différentiel des gènes entre des individus d'une même espèce.\\Les individus les moins adaptés seront voués à disparaître.\\\\
+	\underline {Population} : Ensemble d'individus de la même espèce possédant chacun, des
+	\\caractéristiques différentes (appelées gènes) et issu d'une génération.\\\\
+	\underline{Individu} : Entité issue d'une population possédant un génome (ensemble de gènes) unique.\\\\
+	\underline{Gènes} : Caractéristique créé par l'aléatoire, la mutation ou l'accouplement (croisement génétique) de deux individus de la génération précédente.\\\\
+	\underline{Génération} : Degré d'évolution d'une espèce, plus la génération est avancée plus les individus seront adaptés à la situation à laquelle ils sont confrontés.
+	\\Pendant celle-ci, les individus peuvent se croiser afin de créer les individus pour la génération suivante. Dans le cadre d'un algorithme génétique, les croisements sont contrôlés, les meilleurs individus sont conservés (déterminés par une fonction d'évaluation) et des nouveaux individus générés aléatoirement sont introduits.\\Une fois que tous les nouveaux individus sont présents pour une nouvelle génération, ils subissent une mutation.\\\\
+	\underline{Croisement} : Aussi appelé cross-over génétique, action produite entre deux individus afin de créer un individu pour la génération suivante dont ses gènes sont hérités de ses parents.\\\\
+	\newpage
+	\underline{Mutation} : Action effectuée sur tous les individus consistant à modifier légèrement leurs gènes de façon aléatoire.\\\\
+	\underline{Fonction d'évaluation} : C'est la fonction qui va déterminer si un individu est adapté à la situation dont la fonction d'évaluation dépend. Cette fonction va classer tous les individus afin de garder les meilleurs pour la prochaine génération.\\\\
+	\subsection{Fonctionnement}
+	Le déroulement d'un algorithme génétique prend en compte plusieurs paramètres :
+	\begin{itemize}
+		\item Le nombre de générations à établir.
+		\item Le nombre d'individus que constitue la population.
+		\item Une structure de données représentant les gènes d'un individu (Arbre de décision, réseau neuronal, ...).
+		\item Le pourcentage de la population conservé à la fin d'une génération afin de les croiser génétiquement.
+		\item Valeur représentant la force de la mutation.
+		\item Le quantité de gène qu'un individu possède dans son génome.
+	\end{itemize}
+	Tous ces paramètres influes sur la rapidité de l'algorithme ainsi que sur le résultat obtenu, 
+	la complexité est de trouver des réglages justes et adaptés à la structure de données choisie pour le génome.\\\\
+	Par exemple, plus le nombre de générations est grand, plus la population comportera de bons individus mais en conséquent le calcul sera plus long.\\\\
+	La clé de la réussite est de trouver pour chaque paramètre la valeur qui permettra d'obtenir une population avec une moyenne de performance d'individu très bonne en un minimum de calcul.
+	\newpage
+	Un algorithme génétique se présente de la façon suivante :\\
+    \hspace{0pt}
+    \begin{figure}[h]
+    	\begin{center}
+		\includegraphics[width=12cm]{genetic.png}
+		\caption{Diagramme décrivant le déroulement général d'un algorithme génétique.}
+		\end{center}
+	\end{figure}
+	\begin{itemize}
+	\itemsep0em 
+	\item Les individus constituant la population initiale sont générées de façon totalement aléatoire.\\
+	\item Une première évaluation des individus est faite, selon les paramètres choisis, l'algorithme choisira de bouclé ou non.\\
+	\item La boucle consiste à faire une sélection des meilleurs individus selon l'évaluation, 
+	puis de croiser les individus retenus pour reconstituer une population de même taille que la précédente. Après cette reconstitution, on fait subir une mutation, puis on boucle à nouveau.
+	\end{itemize}
+	
+\newpage
+\lhead{Application des algorithmes génétiques}
+\section{Application des algorithmes génétiques sur la bataille navale}
+	Pour réaliser ce projet, nous avons choisi de développer un algorithme génétique sur le jeu de bataille navale, c'est un jeu en un contre un qui nous permettra de jouer contre une intelligence artificielle après avoir calculé plusieurs générations.
+	\subsection{Règles de la bataille navale}
+	La bataille navale est un jeu de société se jouant en un contre un.\\
+	Chaque joueur possède deux grilles, une grille occupée par les bateaux du joueur, et une autre grille pour attaquer.
+	Le but du jeu sera de couler les bateaux adverses avant qu'il puisse couler les bateaux nos propres navires.\\
+	Le jeu possède deux phases, une phase de placement puis une phase d'attaque :
+	\begin{itemize}
+	\itemsep0em 
+	\item La phase de placement consiste à placer un nombre de bateaux sur une grille, les navires peuvent être placés de façon verticale ou horizontale et doivent être placer à l'abri du regard de l'adversaire.
+	\item Une fois les bateaux placés sur les grilles, chacun leur tour, les joueurs devront attaquer grâce à leur grille d'attaque la flotte adverse. Pour chaque attaque le joueur devra transmettre les coordonnées dur tir effectué puis marquer sur sa grille la case où le tir vient d'être effectué.\\
+	Le joueur adverse doit signaler si le tir effectué à toucher ou rater ses bateaux. Si un bateau est entièrement touché, dans ce cas l'adversaire doit signaler que le bateau a coulé.\\\\
+	Le premier joueur à avoir coulé l'ensemble des navires adverses remporte donc la partie.\\\\
+	\end{itemize}
+	\begin{figure}[h]
+    	\begin{center}
+		\includegraphics[scale=0.6]{jeu.jpg}
+		\caption{Jeu de société de bataille navale.}
+		\end{center}
+	\end{figure}
+	\subsection{Pourquoi avons-nous choisi la bataille navale ?}
+	Le sujet n'imposant pas de jeu pour mettre en place un algorithme génétique, un travail de recherche a été mené afin de trouver le jeu pour ce projet. Pour faciliter la recherche, nous nous sommes poser quelques restrictions pour que l'application de l'algorithme sur ce jeu soit simple et sans une quantité de calculs nécessaire trop grande pour obtenir des résultats convenables.\\\\
+	Le jeu devait être tour par tour et comporter 2 joueurs afin de jouer contre un individu de la dernière génération calculée.\\
+	Avoir un nombre de possibilités de décisions faibles pour les structures de données décrivant le comportement de chaque individu ne soit pas volumineuse et que l'algorithme ne soit pas gourmand en temps de calcul.\\\\
+	Notre première réflexion s'est porté sur le jeu du puissance 4.\\
+	C'est un jeu en un contre un et tour par tout mais qui a comme défaut d'avoir un nombre de configurations beaucoup trop grand (Quantité de jeu estimé à $1,6 \times 10^{13}$).\\
+	La bataille navale possède elle aussi un très grande nombre de situations différentes mais a la grande qualité d'avoir un scénario de jeu récurrent.\\
+	Ce que nous entendons par récurrent, c'est sa capacité à faire revenir le joueur à une réflexion de base plusieurs fois :\\
+	\begin{figure}[h]
+    	\begin{center}
+		\includegraphics[width=12cm]{grille_reset.png}
+		\caption{Grille alliée où deux bateaux sont coulés.}
+		\end{center}
+	\end{figure}
+	\newpage
+	Dans la Figure 3 ci-dessus, on observe une situation récurrente, l'adverse vient de jouer sur notre grille en J-6. Il vient donc de couler notre bateau et se retrouve donc dans une phase de recherche où il devra tirer aléatoirement sur notre grille jusqu'à ce qu'il touche un nouveau bateau.\\
+	C'est cette phase de recherche qui va permettre de rassembler quasiment toutes les combinaisons de jeu possibles en une seule et nous permettra de nous concentrer sur la phase de destruction d'un bateau touché. Le puissance 4 ne possédait pas cette récurrence de jeu, c'est donc pourquoi nous avons choisi la bataille navale.\\
+	
+	\subsection{Résultat recherché}
+\section{Fonctionnement du programme}
+	\subsection{Modèle}
+	\subsection{Interfaces graphiques}
+\section{Résultats}
+
+\newpage
+\section{Webographie}
+%https://fr.wikipedia.org/wiki/Jeu_r%C3%A9solu
+%https://fr.wikipedia.org/wiki/Bataille_navale_(jeu)
+%http://villemin.gerard.free.fr/aJeux1/Societe/Puiss4.htm
+\end{document}
