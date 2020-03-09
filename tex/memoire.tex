@@ -123,14 +123,64 @@
 	\end{figure}
 	\newpage
 	Dans la Figure 3 ci-dessus, on observe une situation récurrente, l'adverse vient de jouer sur notre grille en J-6. Il vient donc de couler notre bateau et se retrouve donc dans une phase de recherche où il devra tirer aléatoirement sur notre grille jusqu'à ce qu'il touche un nouveau bateau.\\
-	C'est cette phase de recherche qui va permettre de rassembler quasiment toutes les combinaisons de jeu possibles en une seule et nous permettra de nous concentrer sur la phase de destruction d'un bateau touché. Le puissance 4 ne possédait pas cette récurrence de jeu, c'est donc pourquoi nous avons choisi la bataille navale.\\
+	C'est cette phase de recherche qui va permettre de rassembler quasiment toutes les combinaisons de jeu possibles en une seule et nous permettra de nous concentrer sur la phase de destruction d'un bateau touché. Le puissance 4 ne possédait pas cette récurrence de jeu car une partie ne possède pas de situation récurrente puisque chaque coup peut totalement changer la stratégie à adopte. c'est donc pourquoi nous avons choisi la bataille navale.\\
+	\begin{figure}[h]
+    	\begin{center}
+		\includegraphics[width=6cm]{p4.png}
+		\caption{Grille de puissance 4.}
+		\end{center}
+	\end{figure}
 	
+	\subsection{Design de l'algorithme génétique pour la bataille navale}
+	Afin de développer notre algorithme génétique pour un jeu de bataille navale, il a fallu dans un premier temps trouver la bonne structure de données pour nos individus puis une fonction d'évaluation pour réaliser la fitness.\\
+	Nous avons fait le choix de représenter une population par un ensemble de séances de tirs sur la même grille, on peux donc déterminer une fonction d'évaluation qui renverrai le nombre de tirs effectués pour couler tous les bateaux de cette grille.\\
+	Un individu sera donc une séance de tir avec un nombre boulets à tirer égale à $S^2$ avec $S$ égale à la taille de la grille, lorsque tous les bateaux placés sur la grille qu'on lui soumet sont coulés, on retiendra le nombre de tir suffisant pour gagner la partie pour cet individu.\\\\
+	Ensuite, pour réaliser le bon choix de structure de données, nous avons du réfléchir à la stratégie que pourrait adopter nos individus durant leurs évolutions. Voici la stratégie type qu'un individu adoptera :
+	\begin{enumerate}
+		\item Tir aléatoirement sur la grille puis passe à l'étape 2 lorsqu'on touche un bateau.
+		\item Parcours un arbre de décision sur lequel est inscrit sur chaque nœud de l'arbre un décalage a additionner par rapport au premier tir de base. Si le tir est réussi on parcours la branche de gauche, sinon on parcours celle de droite, on effectue un deuxième tir selon le nouveau décalage du second nœud et ainsi de suite.
+		\item Une fois le bateau qu'un bateau coule, la stratégie de l'individu recommence à l'étape 1.
+	\end{enumerate}
+	Dans cette stratégie l'étape 1 représente l'ensemble de toute les situations récurrente que possède la bataille navale.
 	\subsection{Résultat recherché}
+	En utilisant un arbre de décision et une fonction d'évaluation basée sur le nombre de tir effectué sur une même grille au sein d'une population, nous avons déterminé que la le comportement que pouvait apprendre un individu serait de tirer plusieurs boulets en forme de croix lorsqu'il passe à l'étape 2 de sa stratégie.\\
+	C'est en effet la réflexion normal qu'un humain possède lorsqu'il joue à la bataille navale puisque c'est la stratégie la plus efficace lorsqu'un connait une coordonnée d'une pièce de bateau sur la grille.
+	\begin{figure}[h]
+    	\begin{center}
+		\includegraphics[width=4cm]{croix.png}
+		\caption{Portion de grille où les tirs sont numérotés.}
+		\end{center}
+	\end{figure}
+	\\Sur la figure 5, on observe la stratégie qu'un individu devra développer durant son évolution, lorsqu'il touchera un bateau (ici dessiné en gris) il formera une croix avec ses tirs afin de trouver l'alignement du bateau et de l'éliminer en tirant sur la longueur de celui-ci.\\
+	Les branches de droite de l'arbre correspondrait donc à un choix d'orientation, lorsqu'on touche une case du bateau, on emprunterai donc une branche de gauche qui permettra de tirer sur toute la longueur. Ce comportement sera donc créer de façon automatique grâce à l'algorithme génétique.
+\newpage
+\lhead{Fonctionnement du programme}
 \section{Fonctionnement du programme}
-	\subsection{Modèle}
+	\subsection{Langage}
+	Pour réaliser ce projet nous avons choisi d'utiliser Python. Ce langage est multi-paradigme et interprété ce qui fait de lui un langage facile d'utilisation, ce qui nous a permis de programmer l'esprit libre afin de nous concentrer uniquement sur l'algorithme qui est le cœur de ce projet.\\
+	L'efficacité de ce langage est moins bonne que d'autre langages telles que le C ou le Java en terme de calculs mais nous avons privilégié un langage confortable et muni de librairies standards complètes afin de réaliser un algorithme génétique fonctionnelle.\\\\
+	Sa libraire TKinter nous a permis de réaliser une interface graphique simplement afin de tester complètement les capacités de l'algorithme génétique. Nous avons même pu intégrer un système de graphique dans TKinter grâce à la libraire Matplotlib afin d'afficher les résultats de l'algorithme génétique dans l'interface graphique.
+	\subsection{Structure du programme}
+	Le code source du programme a été divisé en plusieurs partie dans le dossier /src
+	\begin{itemize}
+		\item Un dossier chart réservé à l'affichage du graphique dans une fenêtre Tkinter à partir des résultats générés par le modèle Core.
+		\item Un dossier core pour le code de l'algortithme génétique et du modèle du jeu de bataille navale. Il présente une classe Game décrivant le comportement d'une partie de bataille navale en utilisant la classe Boat.
+		\item Un dossier graphic où toute la partie interface graphique est stockée, on y trouve une classe singleton App qui lancera une nouvelle fenêtre au début du programme et construira un menu.
+	\end{itemize}
+	Une approche MVC n'a pas peu être établit car TKinter ne possède pas les outils pour développer une architecture telle de façon efficace. D'autres libraires proposent une version MCV de TKinter mais ce n'était pas la philosophie de ce projet.\\
+	Nous avons donc un module core qui s'occupe des calculs, un autre qui s'occupe de l'interface graphique et et effectue des appels de fonctions sur ce module core. Le module chart quant à lui est seulement utilisé lorsqu'on souhaite afficher les résultats des calculs.\\
+	Hormis les dossiers organisant les fonctionnalités du programme, un fichier source main est placé à la racine du dossier /src pour instancier la classe Core ainsi que la création de la fenêtre et du menu.\\\\
+	Le dossier /cfg est utilisé pour stocker le fichier de configuration où sont inscrits les paramètres du programme.\\
+	\newpage
 	\subsection{Interfaces graphiques}
+	Le menu se présente comme ci-dessous :
+	%image menu
+	On peut accéder aux différents modules du programme, il y a partout un sens logique à respecter pour bien utiliser le programme.\\\\
+	En ce qui concerne les statistiques il est préférable de lancer un entrainement complet avant de visualiser la courbe de progression de l'algorithme, cette courbe détermine le nombre de tirs moyen en fonction du numéro de la génération.\\
+	En revanche, il est possible de jouer contre l'IA (un individu extrait de la dernière génération) même si aucun entrainement a été effectué, cet IA jouera purement aléatoirement et présentera un faible niveau de jeu.\\
+	
 \section{Résultats}
-
+	Après plusieurs essais nous avons déterminé cette liste de paramètre comme étant la meilleur pour notre programme :\\
 \newpage
 \section{Webographie}
 %https://fr.wikipedia.org/wiki/Jeu_r%C3%A9solu
