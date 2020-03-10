@@ -161,6 +161,7 @@ class Options(ttk.Frame):
         with open('../cfg/option.json', 'w') as file:
             json.dump(data, file)
         file.close()
+        self.return_app.get_model().clear()
 
 
 def init_option():

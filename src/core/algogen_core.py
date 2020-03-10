@@ -3,7 +3,7 @@ from genetic import Individu
 from random import randint
 import options as o
 import genetic as g
-from math import floor
+from math import ceil
 
 # Etats des cellules
 EMPTY_CELL = 0
@@ -49,6 +49,8 @@ class Core:
     play()
         Simule une action joueur humain dans une partie, qui est une
         instance de Game.
+    clear()
+        Nettoie la population actuelle et retourne à la génération 0
     """
     def __init__(self):
         # Lecture des paramètres
@@ -64,7 +66,6 @@ class Core:
             self.bot.shoot_nb = 0
             game = Game()
             game.place_boat("right", [0, 0], 3, "Sud")
-            #game.place_boat("left", [0, 0], 3, "Sud")
             game.place_random("left", o.options_ship_number, 3, 3)
             game.game_begin()
             ended = False
@@ -73,13 +74,14 @@ class Core:
             fit_tab.append((i, self.bot.fitness()))
             fit_sum += self.bot.fitness()
         fit_tab.sort(key=sort_second)
-        saved = floor((o.options_saved_percentage / 100)
+        saved = ceil((o.options_saved_percentage / 100)
                       * o.options_nbr_idv)
         new_idv_tab = []
         for i in range(saved):
             (x, y) = fit_tab[i]
             new_idv_tab.append(self.pop.idv_tab[x])
         for i in range(o.options_nbr_idv - saved):
+            print(saved)
             idv1 = new_idv_tab[randint(0, saved - 1)]
             idv2 = new_idv_tab[randint(0, saved - 1)]
             new_idv_tab.append(g.merge(idv1, idv2))
@@ -104,6 +106,9 @@ class Core:
         else:
             self.bot.shoot_nb = self.bot.shoot_nb - 1
             return self.play(game, to_attack)
+
+    def clear(self):
+        self.__init__()
 
 
 def sort_second(val):
@@ -281,8 +286,8 @@ class Game:
                     cells.append([i, j])
         return cells
 
-    #Placement aléatoire de nb bateaux de taille situé entre sizemin et sizemax sur le board
-    # board_name
+    # Placement aléatoire de nb bateaux de taille situé entre sizemin et
+    # sizemax sur le board board_name
     def place_random(self, board_name, nb, sizemin, sizemax):
         if sizemax > o.options_grid_size  or sizemin < 1 :
             return False
@@ -294,12 +299,21 @@ class Game:
                 if r == 1 :
                     coordx = randint(0, o.options_grid_size - 1)
                     coordy = randint(0, o.options_grid_size - bsize)
-                    placed = self.place_boat(board_name, [coordx, coordy], bsize, "Sud")
+                    placed = self.place_boat(
+                        board_name,
+                        [coordx, coordy],
+                        bsize,
+                        "Sud")
                 else:
                     coordx = randint(0, o.options_grid_size - bsize)
                     coordy = randint(0, o.options_grid_size - 1)
-                    placed = self.place_boat(board_name, [coordx, coordy], bsize, "Est")
+                    placed = self.place_boat(
+                        board_name,
+                        [coordx, coordy],
+                        bsize,
+                        "Est")
         return True
+
 
 class Boat:
     """

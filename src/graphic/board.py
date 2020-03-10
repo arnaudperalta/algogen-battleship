@@ -78,8 +78,6 @@ class Board(ttk.Frame):
         super().__init__(base_app.master)
         self.cells_by_line = o.options_grid_size
         self.game = Game()
-        # On place un bateau sur la grille ennemi
-        self.game.place_boat("right", (0, 0), 3, "Sud")
         self.base_app = base_app
         root = base_app.master
 

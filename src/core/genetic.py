@@ -115,9 +115,9 @@ class Individu:
     def mutate(self, node=None):
         r = rd.random()
         if r * 100 <= o.options_mutation_chance:
-            node.offset = (rd.randint(-o.options_grid_size, o.options_grid_size),
-                           rd.randint(-o.options_grid_size, o.options_grid_size))
-            print("mutation :" + str(r) + " " + str(o.options_mutation_chance) )
+            node.offset = (
+                rd.randint(-o.options_grid_size, o.options_grid_size),
+                rd.randint(-o.options_grid_size, o.options_grid_size))
         if node.depth < nd.MAX_TREE_DEPTH:
             self.mutate(node.go_child_hit())
             self.mutate(node.go_child_miss())

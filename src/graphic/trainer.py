@@ -39,6 +39,8 @@ class Trainer(ttk.Frame):
     printgen()
         affiche les résultats de l'évaluation de la dernière génération
         calculée
+    reset()
+        Réinitialise la population de la classe Core
     """
     def __init__(self, base_app, model):
         super().__init__(base_app.master)
@@ -68,12 +70,18 @@ class Trainer(ttk.Frame):
             text="Retour",
             command=self.back
         )
+        self.reset_button = ttk.Button(
+            root,
+            text="Réinitialiser",
+            command=self.reset
+        )
 
     def draw(self):
         self.results.pack(side=TOP)
         self.fulltrain_button.pack(side=RIGHT, padx=30)
-        self.steptrain_button.pack(side=RIGHT, padx=120)
-        self.back_button.pack(side=LEFT, padx=30)
+        self.steptrain_button.pack(side=RIGHT, padx=30)
+        self.reset_button.pack(side=RIGHT, padx=60)
+        self.back_button.pack(side=RIGHT, padx=30)
 
     def back(self):
         self.clear()
@@ -108,3 +116,9 @@ class Trainer(ttk.Frame):
                 self.results.insert(END, " | ", "Normal")
         self.results.insert(END, "\n")
         self.results.see(END)
+
+    def reset(self):
+        self.model.clear()
+        self.results.insert(END, "Population réinitalisée.\n", "Normal")
+        self.results.see(END)
+        self.update()
