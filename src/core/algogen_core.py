@@ -70,18 +70,16 @@ class Core:
             game.game_begin()
             ended = False
             while not ended:
-                ended = self.play(game, "left")
+                ended = self.play(game, i, "left")
             fit_tab.append((i, self.bot.fitness()))
             fit_sum += self.bot.fitness()
         fit_tab.sort(key=sort_second)
-        saved = ceil((o.options_saved_percentage / 100)
-                      * o.options_nbr_idv)
+        saved = ceil((o.options_saved_percentage / 100) * o.options_nbr_idv)
         new_idv_tab = []
         for i in range(saved):
             (x, y) = fit_tab[i]
             new_idv_tab.append(self.pop.idv_tab[x])
         for i in range(o.options_nbr_idv - saved):
-            print(saved)
             idv1 = new_idv_tab[randint(0, saved - 1)]
             idv2 = new_idv_tab[randint(0, saved - 1)]
             new_idv_tab.append(g.merge(idv1, idv2))
@@ -92,9 +90,10 @@ class Core:
         return fit_tab
 
     # Return true si la partie est gagnée
-    def play(self, game, to_attack="left"):
-        coord = self.bot.play(game)
-        if coord in game.get_free_cells("left"):
+    def play(self, game, ia_index=0, to_attack="left"):
+        self.bot = self.pop.get_idv(ia_index)
+        coord = self.bot.play(game, to_attack)
+        if coord in game.get_free_cells(to_attack):
             res = game.attack(to_attack, coord)
             if res == HIT_ACTION:
                 self.bot.notify = True
@@ -105,7 +104,7 @@ class Core:
             return False
         else:
             self.bot.shoot_nb = self.bot.shoot_nb - 1
-            return self.play(game, to_attack)
+            return self.play(game, ia_index, to_attack)
 
     def clear(self):
         self.__init__()

@@ -70,18 +70,35 @@ class App(ttk.Frame):
         title.pack()
         # Frame contenant les 5 boutons princpaux du menu
         frame = Frame(root)
-        ttk.Button(frame, text='Jouer vs IA Génétique',
-                   command=self.play_vs_ia, width=20).pack()
-        ttk.Button(frame, text='IA vs IA',
-                   command=root.quit, width=20).pack()
-        ttk.Button(frame, text='Entraîner IA Génétique',
-                   command=self.training_draw, width=20).pack()
-        ttk.Button(frame, text='Statistiques',
-                   command=self.chart, width=20).pack()
-        ttk.Button(frame, text='Options',
-                   command=self.options, width=20).pack(pady=5)
-        ttk.Button(frame, text='Quitter',
-                   command=root.destroy, width=20).pack(pady=5)
+        ttk.Button(
+            frame,
+            text='Jouer vs IA Génétique',
+            command=self.play_vs_ia,
+            width=20).pack()
+        ttk.Button(
+            frame,
+            text='IA vs IA',
+            command=self.ia_vs_ia,
+            width=20).pack()
+        ttk.Button(
+            frame,
+            text='Entraîner IA Génétique',
+            command=self.training_draw,
+            width=20).pack()
+        ttk.Button(
+            frame,
+            text='Statistiques',
+            command=self.chart, width=20).pack()
+        ttk.Button(
+            frame,
+            text='Options',
+            command=self.options,
+            width=20).pack(pady=5)
+        ttk.Button(
+            frame,
+            text='Quitter',
+            command=root.destroy,
+            width=20).pack(pady=5)
         frame.pack(expand=YES)
 
         Label(root, text="Arnaud Peralta, Yohann Goffart, "
@@ -96,6 +113,11 @@ class App(ttk.Frame):
     def play_vs_ia(self):
         self.clear_frame()
         board = Board(self)
+        board.draw()
+
+    def ia_vs_ia(self):
+        self.clear_frame()
+        board = Board(self, human=False)
         board.draw()
 
     def quit_app(self):

@@ -1,6 +1,7 @@
 from tkinter import *
 from tkinter import ttk
 from algogen_core import Game
+from time import sleep
 import algogen_core as core
 import math
 import options as o
@@ -31,6 +32,8 @@ class Board(ttk.Frame):
         au modèle d'une partie de bataille navale
     base_app
         référence vers le singleton App
+    human
+        booléen indiquant si un humain joue sur la grille de gauche
 
     Methodes
     --------
@@ -73,12 +76,14 @@ class Board(ttk.Frame):
         partie s'arrête
     ask_ia()
         récupère le prochain coup jouer par l'IA désigné par le modèle
+        retourne 1 en cas de victoire
     """
-    def __init__(self, base_app):
+    def __init__(self, base_app, human=True):
         super().__init__(base_app.master)
         self.cells_by_line = o.options_grid_size
         self.game = Game()
         self.base_app = base_app
+        self.human = human
         root = base_app.master
 
         # Attributs graphiques et placements
@@ -87,14 +92,22 @@ class Board(ttk.Frame):
             text="Retour",
             command=self.back
         )
+        if human:
+            grid_name = "Ma grille"
+        else:
+            grid_name = "Joueur 1"
         self.board_left_name = Label(
             root,
-            text="Ma grille",
+            text=grid_name,
             font=("Helvetica", 16)
         )
+        if human:
+            grid_name = "Grille adverse"
+        else:
+            grid_name = "Joueur 2"
         self.board_right_name = Label(
             root,
-            text="Grille adverse",
+            text=grid_name,
             font=("Helvetica", 16)
         )
         self.board_left = Canvas(
@@ -131,39 +144,44 @@ class Board(ttk.Frame):
             text="Prêt",
             command=self.ready_clicked
         )
+        if human:
+            label_text = "Phase de jeu : Placez vos bateaux."
+        else:
+            label_text = ""
         self.phase_label = Label(
             root,
-            text="Phase de jeu : Placez vos bateaux."
+            text=label_text
         )
-        self.boat_size_name = Label(
-            root,
-            text="Taille bateau"
-        )
-        self.boat_size = IntVar()
-        self.boat_size.set(3)
-        self.boat_size_entry = Entry(
-            root,
-            textvariable=self.boat_size,
-            width=1
-        )
-        self.orientation_name = Label(
-            root,
-            text="Orientation"
-        )
-        self.orientation = StringVar()
-        self.orientation_choices = {
-            "Nord",
-            "Nord",
-            "Ouest",
-            "Est",
-            "Sud"
-        }
-        self.orientation.set("Nord")
-        self.orientation_menu = ttk.OptionMenu(
-            root,
-            self.orientation,
-            *self.orientation_choices
-        )
+        if human:
+            self.boat_size_name = Label(
+                root,
+                text="Taille bateau"
+            )
+            self.boat_size = IntVar()
+            self.boat_size.set(3)
+            self.boat_size_entry = Entry(
+                root,
+                textvariable=self.boat_size,
+                width=1
+            )
+            self.orientation_name = Label(
+                root,
+                text="Orientation"
+            )
+            self.orientation = StringVar()
+            self.orientation_choices = {
+                "Nord",
+                "Nord",
+                "Ouest",
+                "Est",
+                "Sud"
+            }
+            self.orientation.set("Nord")
+            self.orientation_menu = ttk.OptionMenu(
+                root,
+                self.orientation,
+                *self.orientation_choices
+            )
 
     # Place les éléments graphiques dans la fenêtre
     def draw(self):
@@ -178,15 +196,31 @@ class Board(ttk.Frame):
         self.grey_label.grid(row=2, column=3)
         self.button_ready.grid(row=3, column=3)
         self.phase_label.grid(row=3, column=0, sticky=W)
-        self.boat_size_name.grid(row=3, column=1, sticky=W)
-        self.boat_size_entry.grid(row=3, column=1)
-        self.orientation_name.grid(row=3, column=2, sticky=W)
-        self.orientation_menu.grid(row=3, column=2, sticky=E)
+        if self.human:
+            self.boat_size_name.grid(row=3, column=1, sticky=W)
+            self.boat_size_entry.grid(row=3, column=1)
+            self.orientation_name.grid(row=3, column=2, sticky=W)
+            self.orientation_menu.grid(row=3, column=2, sticky=E)
 
         self.draw_grid(self.board_left, "left")
         self.draw_grid(self.board_right, "right")
         self.game.place_random("right", o.options_ship_number, 3, 3)
-        self.render_board(self.board_left, self.game.get_display_board("left"), ennemy=False)
+        if not self.human:
+            self.game.place_random("left", o.options_ship_number, 3, 3)
+        if self.human:
+            self.render_board(
+                self.board_left,
+                self.game.get_display_board("left"),
+                ennemy=False)
+        else:
+            self.render_board(
+                self.board_left,
+                self.game.get_display_board("left"),
+                ennemy=False)
+            self.render_board(
+                self.board_right,
+                self.game.get_display_board("right"),
+                ennemy=False)
 
     def draw_grid(self, canvas, name):
         canvas.create_rectangle(
@@ -212,9 +246,9 @@ class Board(ttk.Frame):
                 i * cell_size + BORDER_SIZE
             )
         # Mapping des cellules
-        if name == "left":
+        if name == "left" and self.human:
             canvas.bind("<Button-1>", self.boardleft_callback)
-        else:
+        elif self.human:
             canvas.bind("<Button-1>", self.boardright_callback)
         self.draw_grid_coords(canvas)
 
@@ -266,15 +300,40 @@ class Board(ttk.Frame):
             widget.destroy()
 
     def ready_clicked(self):
-        if self.game.game_begin():
+        if self.human:
+            if self.game.game_begin():
+                self.button_ready.destroy()
+                self.orientation_name.destroy()
+                self.orientation_menu.destroy()
+                self.boat_size_name.destroy()
+                self.boat_size_entry.destroy()
+                self.phase_label.configure(
+                    text="Phase de jeu : Tirez sur la grille ennemi."
+                )
+        else:
             self.button_ready.destroy()
-            self.orientation_name.destroy()
-            self.orientation_menu.destroy()
-            self.boat_size_name.destroy()
-            self.boat_size_entry.destroy()
-            self.phase_label.configure(
-                text="Phase de jeu : Tirez sur la grille ennemi."
-            )
+            while 1:
+                won = self.ask_ia(0, "left")
+                self.render_board(
+                    self.board_left,
+                    self.game.get_display_board("left"),
+                    ennemy=False
+                )
+                if won == 1:
+                    break
+                self.board_left.update()
+                sleep(1)
+                self.board_left.update_idletasks()
+                won = self.ask_ia(1, "right")
+                self.render_board(
+                    self.board_right,
+                    self.game.get_display_board("right"),
+                    ennemy=False
+                )
+                if won == 1:
+                    break
+                self.board_right.update()
+                sleep(1)
 
     def render_board(self, canvas, board, ennemy=False):
         for i in range(len(board)):
@@ -346,12 +405,24 @@ class Board(ttk.Frame):
     def game_won(self, winner):
         self.board_left.unbind("<Button 1>")
         self.board_right.unbind("<Button 1>")
-        if winner == "right":
+        if winner == "right" and self.human:
             winner = "IA génétique"
+        elif self.human:
+            winner = "humain"
+        elif winner == "right":
+            winner = "2"
         else:
-            winner = "humain";
+            winner = "1"
         self.phase_label.configure(text="Gagnant : Joueur " + winner)
 
-    def ask_ia(self):
-        if self.base_app.get_model().play(self.game):
-            self.game_won("right")
+    def ask_ia(self, index=0, to_attack="left"):
+        if self.base_app.get_model().play(
+                self.game,
+                ia_index=index,
+                to_attack=to_attack):
+            if index == 0:
+                self.game_won("right")
+            else:
+                self.game_won("left")
+            return 1
+        return 0

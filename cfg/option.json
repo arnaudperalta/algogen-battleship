@@ -1,1 +1,1 @@
-{"nbr_gen": 50, "saved_%": 40, "mut_%": 1.0, "def_gen": 3, "nbr_idv": 100, "grid_size": 5, "ship_nbr": 3}
+{"nbr_gen": 100, "saved_%": 40, "mut_%": 0.001, "def_gen": 3, "nbr_idv": 200, "grid_size": 8, "ship_nbr": 3}

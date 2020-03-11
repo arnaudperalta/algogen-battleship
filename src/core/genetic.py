@@ -61,7 +61,7 @@ class Individu:
         self.last_coord = (0, 0)
         self.shoot_nb = 0
 
-    def play(self, game):
+    def play(self, game, grid_name):
         self.shoot_nb = self.shoot_nb + 1
         if self.notify_drown \
                 or (self.current_node is not None
@@ -93,7 +93,8 @@ class Individu:
                     self.last_coord = (x, y)
                     self.notify = False
                     return [x, y]
-        choices = game.get_free_cells("left")
+        choices = game.get_free_cells(grid_name)
+
         res = choices[rd.randint(0, len(choices) - 1)]
         x = res[0]
         y = res[1]
