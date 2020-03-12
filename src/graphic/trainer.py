@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter import ttk
 import options as o
 from algogen_core import Core
+from math import ceil
 
 # Classe héritant de la classe Frame de tkinter
 
@@ -54,6 +55,7 @@ class Trainer(ttk.Frame):
             bg="black"
         )
         self.results.tag_configure(tagName="Good", foreground="green")
+        self.results.tag_configure(tagName="Bad", foreground="red")
         self.results.tag_configure(tagName="Normal", foreground="white")
         self.fulltrain_button = ttk.Button(
             root,
@@ -109,11 +111,14 @@ class Trainer(ttk.Frame):
             "Normal"
         )
         for i in tab:
-            if i[1] > 10:
-                self.results.insert(END, str(i[1]) + " | ", "Normal")
-            else:
+            if i[1] < ceil(0.4 * (o.options_grid_size**2)):
                 self.results.insert(END, str(i[1]), "Good")
                 self.results.insert(END, " | ", "Normal")
+            elif i[1] > ceil(0.9 * (o.options_grid_size**2)):
+                self.results.insert(END, str(i[1]), "Bad")
+                self.results.insert(END, " | ", "Normal")
+            else:
+                self.results.insert(END, str(i[1]) + " | ", "Normal")
         self.results.insert(END, "\n")
         self.results.see(END)
 
