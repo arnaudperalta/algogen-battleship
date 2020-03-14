@@ -1,1 +1,1 @@
-{"nbr_gen": 100, "saved_%": 40, "mut_%": 0.001, "def_gen": 3, "nbr_idv": 200, "grid_size": 8, "ship_nbr": 3}
+{"nbr_gen": 100, "saved_%": 40, "mut_%": 0.001, "def_gen": 3, "nbr_idv": 200, "grid_size": 8, "ship_nbr": 3, "min_boat_size": 2, "max_boat_size": 5}

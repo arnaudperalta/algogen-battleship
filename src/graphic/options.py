@@ -27,6 +27,8 @@ options_def_gen = 0
 options_nbr_idv = 0
 options_grid_size = 0
 options_ship_number = 0
+options_min_boat_size = 0
+options_max_boat_size = 0
 
 
 class Options(ttk.Frame):
@@ -65,6 +67,8 @@ class Options(ttk.Frame):
         self.nbr_idv = IntVar()
         self.grid_size = IntVar()
         self.ship_number = IntVar()
+        self.min_boat_size = IntVar()
+        self.max_boat_size = IntVar()
 
     def build(self):
         root = self.master
@@ -82,6 +86,10 @@ class Options(ttk.Frame):
         self.grid_size.set(options_grid_size)
         global options_ship_number
         self.ship_number.set(options_ship_number)
+        global options_min_boat_size
+        self.min_boat_size.set(options_min_boat_size)
+        global options_max_boat_size
+        self.max_boat_size.set(options_max_boat_size)
 
         # Liste d'options
         ttk.Label(root, text="Option de l'algorithme :")\
@@ -116,12 +124,20 @@ class Options(ttk.Frame):
             .grid(row=8, column=1)
         ttk.Entry(root, textvariable=self.ship_number)\
             .grid(row=8, column=2)
+        ttk.Label(root, text="Taille minimum d'un bateau") \
+            .grid(row=9, column=1)
+        ttk.Entry(root, textvariable=self.min_boat_size) \
+            .grid(row=9, column=2)
+        ttk.Label(root, text="Taille maximum d'un bateau") \
+            .grid(row=10, column=1)
+        ttk.Entry(root, textvariable=self.max_boat_size) \
+            .grid(row=10, column=2)
         save_button = ttk.Button(root, text='Sauvegarder',
                                  command=self.save_option)
-        save_button.grid(row=9, column=1, columnspan=2)
+        save_button.grid(row=11, column=1, columnspan=2)
         back_button = ttk.Button(root, text='Retour',
                                  command=self.return_call)
-        back_button.grid(row=10, column=1, columnspan=2)
+        back_button.grid(row=12, column=1, columnspan=2)
         root.grid_columnconfigure((0, 3), weight=1)
         root.mainloop()
 
@@ -142,6 +158,8 @@ class Options(ttk.Frame):
         global options_nbr_idv
         global options_grid_size
         global options_ship_number
+        global options_min_boat_size
+        global options_max_boat_size
         options_nbr_gen = self.nbr_gen.get()
         options_saved_percentage = self.saved_percentage.get()
         options_mutation_chance = self.mutation_chance.get()
@@ -149,6 +167,8 @@ class Options(ttk.Frame):
         options_nbr_idv = self.nbr_idv.get()
         options_grid_size = self.grid_size.get()
         options_ship_number = self.ship_number.get()
+        options_min_boat_size = self.min_boat_size.get()
+        options_max_boat_size = self.max_boat_size.get()
         data = {
             "nbr_gen": options_nbr_gen,
             "saved_%": options_saved_percentage,
@@ -156,7 +176,9 @@ class Options(ttk.Frame):
             "def_gen": options_def_gen,
             "nbr_idv": options_nbr_idv,
             "grid_size": options_grid_size,
-            "ship_nbr": options_ship_number
+            "ship_nbr": options_ship_number,
+            "min_boat_size": options_min_boat_size,
+            "max_boat_size": options_max_boat_size
         }
         with open('../cfg/option.json', 'w') as file:
             json.dump(data, file)
@@ -178,6 +200,8 @@ def init_option():
     global options_nbr_idv
     global options_grid_size
     global options_ship_number
+    global options_min_boat_size
+    global options_max_boat_size
     options_nbr_gen = data["nbr_gen"]
     options_saved_percentage = data["saved_%"]
     options_mutation_chance = data["mut_%"]
@@ -185,4 +209,6 @@ def init_option():
     options_nbr_idv = data["nbr_idv"]
     options_grid_size = data["grid_size"]
     options_ship_number = data["ship_nbr"]
+    options_min_boat_size = data["min_boat_size"]
+    options_max_boat_size = data["max_boat_size"]
     file.close()

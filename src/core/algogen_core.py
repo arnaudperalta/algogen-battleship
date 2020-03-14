@@ -66,7 +66,11 @@ class Core:
             self.bot.shoot_nb = 0
             game = Game()
             game.place_boat("right", [0, 0], 3, "Sud")
-            game.place_random("left", o.options_ship_number, 3, 3)
+            game.place_random(
+                "left",
+                o.options_ship_number,
+                min(o.options_min_boat_size, o.options_grid_size),
+                min(o.options_max_boat_size, o.options_grid_size))
             game.game_begin()
             ended = False
             while not ended:
@@ -167,6 +171,16 @@ class Game:
     def place_boat(self, board_name, coords, boat_size, orientation):
         if boat_size < 1:
             return False
+        # On vérifie si on pose pas trop de bateaux
+        boat = 0
+        for i in range(len(self.board1)):
+            for j in range(len(self.board1)):
+                if isinstance(self.board1[i][j], Boat) \
+                        and self.board1[i][j].parent is None:
+                    boat = boat + 1
+        if boat == o.options_ship_number:
+            return False
+
         main_boat = Boat(boat_size)
         if board_name == "left":
             board = self.board1
@@ -244,29 +258,17 @@ class Game:
         return result
 
     def game_begin(self):
-        boat = False
+        boat = 0
         # Vérification du board 1
         for i in range(len(self.board1)):
             for j in range(len(self.board1)):
-                if self.board1[i][j] is not None:
-                    boat = True
-                    break
-            if boat:
-                break
-        if not boat:
-            return False
-        # Vérification du board 2
-        boat = False
-        for i in range(len(self.board2)):
-            for j in range(len(self.board2)):
-                if self.board2[i][j] is not None:
-                    boat = True
-                    break
-            if boat:
-                break
-        if not boat:
+                if isinstance(self.board1[i][j], Boat) \
+                        and self.board1[i][j].parent is None:
+                    boat = boat + 1
+        if boat != o.options_ship_number:
             return False
         self.game_state = ATTACK
+        print(boat)
         return True
 
     def game_reset(self):
