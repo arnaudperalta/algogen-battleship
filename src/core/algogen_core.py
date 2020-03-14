@@ -161,7 +161,7 @@ class Game:
         réinitialise l'instance de Game courante en ré-appelant le
         constructeur
     get_free_cells(board_name)
-        retourne une liste de cases vide où l'IA pour
+        retourne une liste de cases vide où l'IA pourra tirer
     """
     def __init__(self):
         self.game_state = BOATS_PLACEMENT
@@ -173,12 +173,17 @@ class Game:
             return False
         # On vérifie si on pose pas trop de bateaux
         boat = 0
-        for i in range(len(self.board1)):
-            for j in range(len(self.board1)):
-                if isinstance(self.board1[i][j], Boat) \
-                        and self.board1[i][j].parent is None:
+        if board_name == "left":
+            board = self.board1
+        else:
+            board = self.board2
+        for i in range(len(board)):
+            for j in range(len(board)):
+                if isinstance(board[i][j], Boat) \
+                        and board[i][j].parent is None:
                     boat = boat + 1
         if boat == o.options_ship_number:
+            print(board_name)
             return False
 
         main_boat = Boat(boat_size)
@@ -287,32 +292,58 @@ class Game:
                     cells.append([i, j])
         return cells
 
-    # Placement aléatoire de nb bateaux de taille situé entre sizemin et
-    # sizemax sur le board board_name
     def place_random(self, board_name, nb, sizemin, sizemax):
-        if sizemax > o.options_grid_size  or sizemin < 1 :
+        """
+        Placement aléatoire de nb bateaux de taille situé entre sizemin et
+            sizemax sur le board board_name
+        """
+        if sizemax > o.options_grid_size or sizemin < 1:
             return False
         for i in range(nb):
             placed = False
             while not placed:
                 r = randint(0, 1)
                 bsize = randint(sizemin, sizemax)
-                if r == 1 :
+                if r == 1:
                     coordx = randint(0, o.options_grid_size - 1)
                     coordy = randint(0, o.options_grid_size - bsize)
-                    placed = self.place_boat(
-                        board_name,
-                        [coordx, coordy],
-                        bsize,
-                        "Sud")
+                    if board_name == "all":
+                        placed = self.place_boat(
+                            "left",
+                            [coordx, coordy],
+                            bsize,
+                            "Sud")
+                        self.place_boat(
+                            "right",
+                            [coordx, coordy],
+                            bsize,
+                            "Sud")
+                    else:
+                        placed = self.place_boat(
+                            board_name,
+                            [coordx, coordy],
+                            bsize,
+                            "Sud")
                 else:
                     coordx = randint(0, o.options_grid_size - bsize)
                     coordy = randint(0, o.options_grid_size - 1)
-                    placed = self.place_boat(
-                        board_name,
-                        [coordx, coordy],
-                        bsize,
-                        "Est")
+                    if board_name == "all":
+                        placed = self.place_boat(
+                            "left",
+                            [coordx, coordy],
+                            bsize,
+                            "Est")
+                        self.place_boat(
+                            "right",
+                            [coordx, coordy],
+                            bsize,
+                            "Est")
+                    else:
+                        placed = self.place_boat(
+                            board_name,
+                            [coordx, coordy],
+                            bsize,
+                            "Est")
         return True
 
 
@@ -405,7 +436,6 @@ class Boat:
         return False
 
 
-# Créer un board d'une taille size
 def create_board(size):
     """
     créer un board representé par un tableau a deux dimenions de taille

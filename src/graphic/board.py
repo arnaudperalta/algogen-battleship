@@ -204,31 +204,26 @@ class Board(ttk.Frame):
 
         self.draw_grid(self.board_left, "left")
         self.draw_grid(self.board_right, "right")
-        self.game.place_random(
-            "right",
-            o.options_ship_number,
-            min(o.options_min_boat_size, o.options_grid_size),
-            min(o.options_max_boat_size, o.options_grid_size))
         if not self.human:
             self.game.place_random(
-                "left",
+                "all",
                 o.options_ship_number,
                 min(o.options_min_boat_size, o.options_grid_size),
                 min(o.options_max_boat_size, o.options_grid_size))
-        if self.human:
-            self.render_board(
-                self.board_left,
-                self.game.get_display_board("left"),
-                ennemy=False)
         else:
-            self.render_board(
-                self.board_left,
-                self.game.get_display_board("left"),
-                ennemy=False)
-            self.render_board(
-                self.board_right,
-                self.game.get_display_board("right"),
-                ennemy=False)
+            self.game.place_random(
+                "right",
+                o.options_ship_number,
+                min(o.options_min_boat_size, o.options_grid_size),
+                min(o.options_max_boat_size, o.options_grid_size))
+        self.render_board(
+            self.board_left,
+            self.game.get_display_board("left"),
+            ennemy=False)
+        self.render_board(
+            self.board_right,
+            self.game.get_display_board("right"),
+            ennemy=False)
 
     def draw_grid(self, canvas, name):
         canvas.create_rectangle(
