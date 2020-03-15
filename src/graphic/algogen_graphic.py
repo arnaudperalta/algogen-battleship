@@ -72,6 +72,11 @@ class App(ttk.Frame):
         frame = Frame(root)
         ttk.Button(
             frame,
+            text='Entraînement',
+            command=self.training_draw,
+            width=20).pack()
+        ttk.Button(
+            frame,
             text='Jouer vs IA Génétique',
             command=self.play_vs_ia,
             width=20).pack()
@@ -79,11 +84,6 @@ class App(ttk.Frame):
             frame,
             text='IA vs IA',
             command=self.ia_vs_ia,
-            width=20).pack()
-        ttk.Button(
-            frame,
-            text='Entraîner IA Génétique',
-            command=self.training_draw,
             width=20).pack()
         ttk.Button(
             frame,
