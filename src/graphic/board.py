@@ -210,6 +210,10 @@ class Board(ttk.Frame):
                 o.options_ship_number,
                 min(o.options_min_boat_size, o.options_grid_size),
                 min(o.options_max_boat_size, o.options_grid_size))
+            self.render_board(
+                self.board_right,
+                self.game.get_display_board("right"),
+                ennemy=False)
         else:
             self.game.place_random(
                 "right",
@@ -219,10 +223,6 @@ class Board(ttk.Frame):
         self.render_board(
             self.board_left,
             self.game.get_display_board("left"),
-            ennemy=False)
-        self.render_board(
-            self.board_right,
-            self.game.get_display_board("right"),
             ennemy=False)
 
     def draw_grid(self, canvas, name):
