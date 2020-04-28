@@ -5,11 +5,15 @@ L'algorithme est basé sur le jeu de bataille navale muni d'une interface graphi
 
 Pour installer les dépendances du programmme :
 
-`pip3 install -r requirements.txt`
+`$ pip3 install -r requirements.txt`
 
 Pour exécuter le programme il suffit de se placer dans le dossier src puis d'exécuter la commande suivante : 
 
-`python3 algogen_main.py`
+`$ python3 algogen_main.py`
+
+Si une erreur apparait indiquant qu'il manque le module TKinter :
+
+`$ sudo apt-get install python3-tk`
 
 ## Menu principal
 <img src="https://i.imgur.com/l7MyIGx.png" data-canonical-src="https://i.imgur.com/l7MyIGx.png" height="400" />
