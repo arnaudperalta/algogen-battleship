@@ -1,5 +1,5 @@
 from random import randint
-import options as o
+import graphic.options as o
 
 MAX_TREE_DEPTH = 10
 

@@ -1,7 +1,7 @@
 from tkinter import *
 from tkinter import ttk
-import options as o
-from algogen_core import Core
+import graphic.options as o
+from core.algogen_core import Core
 from math import ceil
 
 # Classe héritant de la classe Frame de tkinter

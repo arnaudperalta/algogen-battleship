@@ -1,10 +1,10 @@
 from tkinter import *
 from tkinter import ttk
-from algogen_core import Game
+from core.algogen_core import Game
 from time import sleep
-import algogen_core as core
+import core.algogen_core as core
 import math
-import options as o
+import graphic.options as o
 
 BOARD_SIZE = 400
 BORDER_SIZE = 5

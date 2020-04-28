@@ -3,7 +3,7 @@ from tkinter import ttk
 from tkinter.ttk import *
 from matplotlib.figure import Figure
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
-import options as o
+import graphic.options as o
 import matplotlib
 
 matplotlib.use("TkAgg")

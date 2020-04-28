@@ -1,7 +1,7 @@
 import json
-from algogen_graphic import App
-from algogen_core import Core
-import options as o
+from graphic.algogen_graphic import App
+from core.algogen_core import Core
+import graphic.options as o
 
 
 def main():

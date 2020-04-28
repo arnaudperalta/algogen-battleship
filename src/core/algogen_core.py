@@ -1,8 +1,8 @@
-from genetic import Population
-from genetic import Individu
+from core.genetic import Population
+from core.genetic import Individu
 from random import randint
-import options as o
-import genetic as g
+import graphic.options as o
+import core.genetic as g
 from math import ceil
 
 # Etats des cellules
@@ -183,7 +183,6 @@ class Game:
                         and board[i][j].parent is None:
                     boat = boat + 1
         if boat == o.options_ship_number:
-            print(board_name)
             return False
 
         main_boat = Boat(boat_size)
@@ -273,7 +272,6 @@ class Game:
         if boat != o.options_ship_number:
             return False
         self.game_state = ATTACK
-        print(boat)
         return True
 
     def game_reset(self):

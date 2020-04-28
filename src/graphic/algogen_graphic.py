@@ -1,9 +1,9 @@
 from tkinter import ttk
 from tkinter import *
-from algogen_chart import Chart
-from board import Board
-from trainer import Trainer
-from options import Options
+from chart.algogen_chart import Chart
+from graphic.board import Board
+from graphic.trainer import Trainer
+from graphic.options import Options
 
 
 class App(ttk.Frame):

@@ -1,7 +1,7 @@
-from node import Node
+from core.node import Node
 import random as rd
-import options as o
-import node as nd
+import graphic.options as o
+import core.node as nd
 from math import floor
 
 
