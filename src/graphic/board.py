@@ -169,14 +169,14 @@ class Board(ttk.Frame):
                 text="Orientation"
             )
             self.orientation = StringVar()
-            self.orientation_choices = {
+            self.orientation_choices = (
                 "Nord",
                 "Nord",
                 "Ouest",
                 "Est",
                 "Sud"
-            }
-            self.orientation.set("Nord")
+            )
+            self.orientation.set(self.orientation_choices[0])
             self.orientation_menu = ttk.OptionMenu(
                 root,
                 self.orientation,
